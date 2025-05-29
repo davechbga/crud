@@ -2,8 +2,6 @@
 import type { User } from "@/interfaces/auth";
 import { account, ID } from "../../lib/appwrite";
 
-
-
 // Servicio de autenticación para manejar el registro, inicio de sesión y obtención del usuario actual
 export const authService = {
   async getCurrentUser(): Promise<User | null> {

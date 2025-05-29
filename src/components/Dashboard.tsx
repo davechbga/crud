@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { LogOut, Plus, Search, FileText } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import type { Resource } from "@/interfaces/resources";
 
 import ResourceForm from "../features/resources/ResourceForm";
 import ResourceCard from "../features/resources/ResourceCard";
@@ -22,7 +22,6 @@ const Dashboard = () => {
   const { resources, addResource, updateResource, deleteResource } =
     useResources();
   const [showForm, setShowForm] = useState(false);
-  type Resource = (typeof resources)[number];
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -43,12 +42,12 @@ const Dashboard = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const handleEdit = (resource: any) => {
+  const handleEdit = (resource: Resource) => {
     setEditingResource(resource);
     setShowForm(true);
   };
 
-  const handleFormSubmit = (resourceData: any) => {
+  const handleFormSubmit = (resourceData: Omit<Resource, "$id" | "createdAt"> & { file?: File }) => {
     if (editingResource) {
       updateResource(editingResource.$id, resourceData);
     } else {

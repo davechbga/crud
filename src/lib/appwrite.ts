@@ -56,7 +56,8 @@ export const createResource = async (data: Omit<Resource, '$id' | 'createdAt'>) 
     try {
         // Obtener el usuario actual primero
         const currentUser = await account.get();
-        
+
+        // Asegurarse de que el usuario actual tenga un ID
         const response = await databases.createDocument(
             DATABASE_ID,
             RESOURCES_COLLECTION_ID,

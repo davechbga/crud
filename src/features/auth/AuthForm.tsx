@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import {
   Card,
@@ -31,12 +30,14 @@ const AuthForm = () => {
         description: "Has iniciado sesión correctamente.",
       });
     } catch (error) {
+      console.error("Error de inicio de sesión:", error);
       toast.error("Error de inicio de sesión", {
         description: "Por favor, verifica tus credenciales.",
       });
     }
   };
 
+  // Maneja el registro de un nuevo usuario
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -55,6 +56,7 @@ const AuthForm = () => {
         fullName: "",
       });
     } catch (error) {
+      console.error("Error de registro:", error);
       toast.error("Error de registro", {
         description: "No se pudo crear la cuenta. Por favor, intenta de nuevo.",
       });

@@ -14,9 +14,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FileText, Calendar, Trash, Plus } from "lucide-react";
+import { FileText, Calendar, Trash, Plus, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import type { Resource } from "@/interfaces/resources";
+import { formatDate } from "@/lib/utils";
 
 interface ResourceCardProps {
   resource: Resource;
@@ -29,14 +30,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
 
+
+  // Manejar la eliminación del recurso
   const handleDelete = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este recurso?')) {
       onDelete(resource.$id);
@@ -46,11 +42,12 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     }
   };
 
+  // Manejar la apertura del recurso
   const handleOpenResource = () => {
     if (resource.linkUrl) {
       window.open(resource.linkUrl, "_blank");
     } else if (resource.fileUrl) {
-      // Open PDF in a new tab
+      // Abrir archivo en una nueva pestaña
       const fileUrl = `${resource.fileUrl}&mode=admin`;
       window.open(fileUrl, "_blank");
       
@@ -60,6 +57,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     }
   };
 
+  // Funcion para obtener el color de la categoría
   const getCategoryColor = (category: string) => {
     const colors = {
       Documentación: "bg-blue-100 text-blue-800",
@@ -87,10 +85,11 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white z-50">
               <DropdownMenuItem onClick={() => onEdit(resource)}>
+                <Pencil className="h-4 w-4 mr-2" />
                 Editar
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDelete} className="text-red-600">
-                <Trash className="h-4 w-4 mr-2" />
+                <Trash className="h-4 w-4 mr-2 text-red-600" />
                 Eliminar
               </DropdownMenuItem>
             </DropdownMenuContent>

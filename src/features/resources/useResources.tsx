@@ -16,6 +16,7 @@ export const useResources = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Cargar los recursos al inicializar el hook
   useEffect(() => {
     fetchResources();
   }, []);

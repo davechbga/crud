@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth debe ser usado dentro de AuthProvider");
   }
   return context;
 };
@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkUser();
   }, []);
 
+  // Función para verificar si el usuario ya está autenticado
   const checkUser = async () => {
     try {
       const userData = await account.get();
@@ -46,8 +47,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: userData.email,
         fullName: userData.name || userData.email.split("@")[0],
       });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
     } catch (error) {
+      console.error("Error al obtener el usuario actual:", error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -58,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      // Intentamos iniciar sesión usando el método correcto para Appwrite v18.1.1
+      // Creamos una sesión de email y contraseña
       const session = await account.createEmailPasswordSession(email, password);
       console.log("Session created:", session);
 

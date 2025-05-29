@@ -19,11 +19,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import type { Resource } from "@/interfaces/resources";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ResourceFormProps {
   resource?: Resource | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit: (data: any) => void;
+  onSubmit: (data: Omit<Resource, "$id" | "createdAt"> & { file?: File }) => void;
   onCancel: () => void;
   categories: string[];
 }
@@ -34,6 +34,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
   onCancel,
   categories,
 }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -44,6 +45,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [attachmentType, setAttachmentType] = useState<"link" | "file">("link");
 
+  // Cargar datos del recurso si se está editando
   useEffect(() => {
     if (resource) {
       setFormData({
@@ -57,13 +59,16 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     }
   }, [resource]);
 
+  // Limpiar el estado al cerrar el diálogo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validar campos obligatorios
     if (
       !formData.title.trim() ||
       !formData.description.trim() ||
-      !formData.category
+      !formData.category ||
+      !user?.id
     ) {
       toast.error("Error de validación", {
         description: "Por favor completa todos los campos obligatorios.",
@@ -72,17 +77,17 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     }
 
     // Preparar los datos según el tipo de adjunto
-    const submitData = {
+    const submitData: Omit<Resource, "$id" | "createdAt"> & { file?: File } = {
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category,
-      // Solo incluir la URL relevante según el tipo de adjunto
+      userId: user.id,
       ...(attachmentType === "link" && formData.linkUrl
         ? { linkUrl: formData.linkUrl.trim() }
-        : { linkUrl: null }),
+        : { linkUrl: undefined }),
       ...(attachmentType === "file" && selectedFile
         ? { file: selectedFile }
-        : { file: null })
+        : {})
     };
 
     // Si estamos editando un recurso existente, asegurarse de que tengamos el ID
@@ -102,6 +107,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     });
   };
 
+  // Manejar cambios en los campos del formulario
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -109,6 +115,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     }));
   };
 
+  // Manejar el cambio de archivo
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
