@@ -54,13 +54,17 @@ export const deleteFile = async (fileId: string) => {
 // Funciones auxiliares para recursos
 export const createResource = async (data: Omit<Resource, '$id' | 'createdAt'>) => {
     try {
+        // Obtener el usuario actual primero
+        const currentUser = await account.get();
+        
         const response = await databases.createDocument(
             DATABASE_ID,
             RESOURCES_COLLECTION_ID,
             ID.unique(),
             {
                 ...data,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                userId: currentUser.$id // Usar el ID del usuario actual
             }
         );
         return response as unknown as Resource;
@@ -73,10 +77,14 @@ export const createResource = async (data: Omit<Resource, '$id' | 'createdAt'>) 
 // Funciones para manejar recursos
 export const getResources = async () => {
     try {
+        const currentUser = await account.get();
         const response = await databases.listDocuments(
             DATABASE_ID,
             RESOURCES_COLLECTION_ID,
-            [Query.orderDesc('createdAt')]
+            [
+                Query.orderDesc('createdAt'),
+                Query.equal('userId', currentUser.$id)
+            ]
         );
         return response.documents as unknown as Resource[];
     } catch (error) {

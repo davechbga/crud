@@ -7,4 +7,5 @@ export interface Resource {
   fileId?: string;
   linkUrl?: string;
   createdAt: string;
+  userId: string;
 }
