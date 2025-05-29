@@ -8,9 +8,9 @@ Aplicación CRUD desarrollada con **React + TypeScript + Appwrite** para la gest
 - [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
 - [Appwrite](https://appwrite.io/)
-- [ShadCN/UI](https://ui.shadcn.dev/)
+- [ShadCN/UI](https://ui.shadcn.com/)
 - [TailwindCSS](https://tailwindcss.com/)
-- [Sonner](https://sonner.emilkowal.dev/) para notificaciones
+- [Sonner](https://sonner.emilkowal.ski/getting-started) para notificaciones
 
 ## 🧱 Estructura del Proyecto
 
@@ -20,14 +20,20 @@ src/
 ├── contexts/
 │   └── AuthContext.tsx
 ├── features/
-│   └── auth/
-│       ├── AuthForm.tsx
-│       ├── authService.ts
-│       └── useAuth.ts
+│   ├── auth/
+│   │   ├── AuthForm.tsx
+│   │   ├── authService.ts
+│   │   └── useAuth.ts
+│   └── resources/
+│       ├── ResourceCard.tsx
+│       ├── ResourceForm.tsx
+│       └── useResources.tsx
 ├── lib/
 │   └── appwrite.ts
 ├── pages/
-│   └── Home.tsx
+│   └── Index.tsx
+│   └── NotFound.tsx
+│   App.tsx
 └── main.tsx
 ```
 
