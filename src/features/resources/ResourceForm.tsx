@@ -18,10 +18,11 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import type { Resource } from "@/hooks/useResources";
+import type { Resource } from "@/interfaces/resources";
 
 interface ResourceFormProps {
   resource?: Resource | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit: (data: any) => void;
   onCancel: () => void;
   categories: string[];
@@ -40,6 +41,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     linkUrl: "",
     fileUrl: "",
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [attachmentType, setAttachmentType] = useState<"link" | "file">("link");
 
   useEffect(() => {
@@ -69,14 +71,27 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       return;
     }
 
+    // Preparar los datos según el tipo de adjunto
     const submitData = {
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category,
-      ...(attachmentType === "link"
-        ? { linkUrl: formData.linkUrl }
-        : { fileUrl: formData.fileUrl }),
+      // Solo incluir la URL relevante según el tipo de adjunto
+      ...(attachmentType === "link" && formData.linkUrl
+        ? { linkUrl: formData.linkUrl.trim() }
+        : { linkUrl: null }),
+      ...(attachmentType === "file" && selectedFile
+        ? { file: selectedFile }
+        : { file: null })
     };
+
+    // Si estamos editando un recurso existente, asegurarse de que tengamos el ID
+    if (resource && !resource.$id) {
+      toast.error("Error", {
+        description: "No se pudo identificar el recurso a actualizar.",
+      });
+      return;
+    }
 
     onSubmit(submitData);
 
@@ -92,6 +107,33 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validar el tipo de archivo
+      if (file.type !== 'application/pdf') {
+        toast.error("Error", {
+          description: "Solo se permiten archivos PDF.",
+        });
+        return;
+      }
+      
+      // Validar el tamaño del archivo (máx 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Error", {
+          description: "El archivo no debe superar los 5MB.",
+        });
+        return;
+      }
+
+      setSelectedFile(file);
+      setFormData(prev => ({
+        ...prev,
+        fileUrl: file.name
+      }));
+    }
   };
 
   return (
@@ -176,20 +218,11 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                   id="fileUrl"
                   type="file"
                   accept=".pdf"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      // In a real app, you would upload the file and get a URL
-                      handleInputChange(
-                        "fileUrl",
-                        `mock-upload-url/${file.name}`
-                      );
-                    }
-                  }}
+                  onChange={handleFileChange}
                 />
                 {formData.fileUrl && (
                   <p className="text-sm text-gray-600">
-                    Archivo: {formData.fileUrl.split("/").pop()}
+                    Archivo: {formData.fileUrl}
                   </p>
                 )}
               </TabsContent>

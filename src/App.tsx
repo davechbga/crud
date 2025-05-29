@@ -1,22 +1,13 @@
 import { Toaster } from "./components/ui/sonner";
+import { AppRoutes } from "./app/routes";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-
-const App = () => (
-  
+const App = () => {
+  return (
     <>
       <Toaster />
-     
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AppRoutes />
     </>
-);
+  );
+};
 
 export default App;

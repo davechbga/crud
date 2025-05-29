@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import {
   Card,
@@ -26,12 +27,12 @@ const AuthForm = () => {
     e.preventDefault();
     try {
       await login(loginData.email, loginData.password);
-      toast("¡Bienvenido!", {
+      toast.success("¡Bienvenido!", {
         description: "Has iniciado sesión correctamente.",
       });
     } catch (error) {
-      toast.error("Error", {
-        description: "Credenciales incorrectas.",
+      toast.error("Error de inicio de sesión", {
+        description: "Por favor, verifica tus credenciales.",
       });
     }
   };
@@ -45,11 +46,17 @@ const AuthForm = () => {
         registerData.fullName
       );
       toast.success("¡Registro exitoso!", {
-        description: "Tu cuenta ha sido creada correctamente.",
+        description: "Tu cuenta ha sido creada. Por favor, inicia sesión.",
+      });
+      // Limpiar el formulario de registro
+      setRegisterData({
+        email: "",
+        password: "",
+        fullName: "",
       });
     } catch (error) {
-      toast.error("Error", {
-        description: "No se pudo crear la cuenta.",
+      toast.error("Error de registro", {
+        description: "No se pudo crear la cuenta. Por favor, intenta de nuevo.",
       });
     }
   };
@@ -162,6 +169,7 @@ const AuthForm = () => {
                       }
                       placeholder="••••••••"
                       required
+                      minLength={8}
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>

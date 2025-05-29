@@ -1,54 +1,96 @@
-# React + TypeScript + Vite
+# Gestión de Recursos Técnicos
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación CRUD desarrollada con **React + TypeScript + Appwrite** para la gestión de recursos técnicos.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologías Utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [Appwrite](https://appwrite.io/)
+- [ShadCN/UI](https://ui.shadcn.dev/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Sonner](https://sonner.emilkowal.dev/) para notificaciones
 
-## Expanding the ESLint configuration
+## 🧱 Estructura del Proyecto
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+src/
+├── components/
+├── contexts/
+│   └── AuthContext.tsx
+├── features/
+│   └── auth/
+│       ├── AuthForm.tsx
+│       ├── authService.ts
+│       └── useAuth.ts
+├── lib/
+│   └── appwrite.ts
+├── pages/
+│   └── Home.tsx
+└── main.tsx
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ⚙️ Instrucciones para Correr el Proyecto Localmente
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **Clonar el repositorio:**
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+git clone https://github.com/davechbga/crud.git
+cd crud
 ```
+
+2. **Instalar dependencias:**
+
+```bash
+npm install
+```
+
+3. **Configurar variables de entorno:**
+
+Crea un archivo `.env` en la raíz del proyecto con los siguientes valores:
+
+```env
+VITE_APPWRITE_ENDPOINT=https://<tu-endpoint-appwrite>
+VITE_APPWRITE_PROJECT=<tu-id-de-proyecto>
+VITE_APPWRITE_DATABASE=<tu-id-de-database>
+VITE_APPWRITE_COLLECTION=<tu-id-de-colección>
+```
+
+4. **Levantar la aplicación:**
+
+```bash
+npm run dev
+```
+
+5. **Acceder desde tu navegador:**
+
+```
+http://localhost:5173
+```
+
+## 🧪 Funcionalidades
+
+- Registro e inicio de sesión de usuarios
+- Manejo de sesión con Appwrite
+- Validación de formularios
+- Manejo de errores y feedback al usuario
+- Código organizado por módulos y características
+
+## 📁 Recomendaciones
+
+- Usa cuentas válidas para probar la autenticación.
+- Verifica que tu Appwrite esté corriendo y accesible desde el frontend.
+- Si usas Appwrite local, configura correctamente tu archivo `hosts`.
+
+## 🧠 Buenas Prácticas
+
+- Código modular y limpio
+- Separación lógica por feature
+- Uso de tipado fuerte con TypeScript
+- Composición con Hooks
+- Feedback inmediato al usuario con notificaciones
+
+---
+
+Hecho con 💻 por [davechbga](https://github.com/davechbga)

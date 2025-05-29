@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FileText, Calendar, Trash, Plus } from "lucide-react";
 import { toast } from "sonner";
-import type { Resource } from "@/hooks/useResources";
+import type { Resource } from "@/interfaces/resources";
 
 interface ResourceCardProps {
   resource: Resource;
@@ -38,8 +38,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
   };
 
   const handleDelete = () => {
-    if (confirm("¿Estás seguro de que quieres eliminar este recurso?")) {
-      onDelete(resource.id);
+    if (window.confirm('¿Estás seguro de que deseas eliminar este recurso?')) {
+      onDelete(resource.$id);
       toast("Recurso eliminado", {
         description: "El recurso ha sido eliminado correctamente.",
       });
@@ -50,9 +50,12 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     if (resource.linkUrl) {
       window.open(resource.linkUrl, "_blank");
     } else if (resource.fileUrl) {
-      // In a real app, this would open or download the file
-      toast("Abriendo archivo", {
-        description: "El archivo se está descargando...",
+      // Open PDF in a new tab
+      const fileUrl = `${resource.fileUrl}&mode=admin`;
+      window.open(fileUrl, "_blank");
+      
+      toast("Archivo abierto", {
+        description: "El archivo se ha abierto en una nueva pestaña.",
       });
     }
   };

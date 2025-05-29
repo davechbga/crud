@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
-import AuthForm from '../components/auth/AuthForm';
-import Dashboard from '../components/dashboard/Dashboard';
+import AuthForm from '../features/auth/AuthForm';
+import Dashboard from '../components/Dashboard';
 
 const AppContent = () => {
   const { user } = useAuth();
