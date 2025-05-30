@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -14,7 +14,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FileText, Calendar, Trash, Plus, Pencil } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { FileText, Calendar, Trash, Plus, Pencil, Link } from "lucide-react";
 import { toast } from "sonner";
 import type { Resource } from "@/interfaces/resources";
 import { formatDate } from "@/lib/utils";
@@ -30,16 +38,19 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Manejar la eliminación del recurso
   const handleDelete = () => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este recurso?')) {
-      onDelete(resource.$id);
-      toast("Recurso eliminado", {
-        description: "El recurso ha sido eliminado correctamente.",
-      });
-    }
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    onDelete(resource.$id);
+    setIsDeleteDialogOpen(false);
+    toast("Recurso eliminado", {
+      description: "El recurso ha sido eliminado correctamente.",
+    });
   };
 
   // Manejar la apertura del recurso
@@ -50,10 +61,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
       // Abrir archivo en una nueva pestaña
       const fileUrl = `${resource.fileUrl}&mode=admin`;
       window.open(fileUrl, "_blank");
-      
-      toast("Archivo abierto", {
-        description: "El archivo se ha abierto en una nueva pestaña.",
-      });
+
+      toast("Archivo abierto", {});
     }
   };
 
@@ -71,59 +80,91 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg font-medium leading-6 mb-2">
-            {resource.title}
-          </CardTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white z-50">
-              <DropdownMenuItem onClick={() => onEdit(resource)}>
-                <Pencil className="h-4 w-4 mr-2" />
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
-                <Trash className="h-4 w-4 mr-2 text-red-600" />
-                Eliminar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <Badge className={`w-fit ${getCategoryColor(resource.category)}`}>
-          {resource.category}
-        </Badge>
-      </CardHeader>
+    <>
+      <Card className="hover:shadow-md transition-shadow duration-200">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <CardTitle className="text-lg font-medium leading-6 mb-2">
+              {resource.title}
+            </CardTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white z-50">
+                <DropdownMenuItem onClick={() => onEdit(resource)}>
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="text-red-600"
+                >
+                  <Trash className="h-4 w-4 mr-2 text-red-600" />
+                  Eliminar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <Badge className={`w-fit ${getCategoryColor(resource.category)}`}>
+            {resource.category}
+          </Badge>
+        </CardHeader>
 
-      <CardContent className="pb-4">
-        <p className="text-gray-600 text-sm line-clamp-3">
-          {resource.description}
-        </p>
+        <CardContent className="pb-4">
+          <p className="text-gray-600 text-sm line-clamp-3">
+            {resource.description}
+          </p>
 
-        <div className="flex items-center text-xs text-gray-500 mt-3">
-          <Calendar className="h-3 w-3 mr-1" />
-          {formatDate(resource.createdAt)}
-        </div>
-      </CardContent>
+          <div className="flex items-center text-xs text-gray-500 mt-3">
+            <Calendar className="h-3 w-3 mr-1" />
+            {formatDate(resource.createdAt)}
+          </div>
+        </CardContent>
 
-      <CardFooter className="pt-0">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleOpenResource}
-          className="w-full"
-          disabled={!resource.linkUrl && !resource.fileUrl}
-        >
-          <FileText className="h-4 w-4 mr-2" />
-          {resource.linkUrl ? "Abrir Enlace" : "Ver Archivo"}
-        </Button>
-      </CardFooter>
-    </Card>
+        <CardFooter className="pt-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenResource}
+            className="w-full"
+            disabled={!resource.linkUrl && !resource.fileUrl}
+          >
+            {resource.linkUrl ? (
+              <Link className="h-4 w-4 mr-2" />
+            ) : (
+              <FileText className="h-4 w-4 mr-2" />
+            )}
+            {resource.linkUrl ? "Abrir Enlace" : "Ver Archivo"}
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>¿Eliminar recurso?</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas eliminar este recurso? Esta acción no
+              se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Eliminar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

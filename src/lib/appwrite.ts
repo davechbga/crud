@@ -42,6 +42,7 @@ export const uploadFile = async (file: File) => {
     }
 };
 
+// Elimina un archivo por su ID
 export const deleteFile = async (fileId: string) => {
     try {
         await storage.deleteFile(STORAGE_BUCKET_ID, fileId);

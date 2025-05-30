@@ -60,7 +60,7 @@ npm install
 ```
 
 3. **Configurar variables de entorno:**
-
+NOTA: SE INCLUYE DENTRO DE REPOSITORIO CREDENCIALES DE APPWRITE PARA QUE PUEDAS PROBARLO DIRECTAMENTE.
 Crea un archivo `.env` en la raíz del proyecto con los siguientes valores:
 
 ```env
