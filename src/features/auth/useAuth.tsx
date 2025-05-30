@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { account, ID } from "../lib/appwrite";
 import type { User } from "@/interfaces/auth";
+import { account, ID } from "@/lib/appwrite";
 
 interface AuthContextType {
   user: User | null;
@@ -47,7 +47,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: userData.email,
         fullName: userData.name || userData.email.split("@")[0],
       });
-   
     } catch (error) {
       console.error("Error al obtener el usuario actual:", error);
       setUser(null);
@@ -62,11 +61,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Creamos una sesión de email y contraseña
       const session = await account.createEmailPasswordSession(email, password);
-      console.log("Session created:", session);
+      console.log("Sesión creada:", session);
 
       // Si la sesión se crea correctamente, obtenemos los datos del usuario
       const userData = await account.get();
-      console.log("User data:", userData);
+      console.log("Datos del usuario:", userData);
 
       setUser({
         id: userData.$id,

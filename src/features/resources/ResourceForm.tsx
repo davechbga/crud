@@ -19,7 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import type { Resource } from "@/interfaces/resources";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../auth/useAuth";
 
 interface ResourceFormProps {
   resource?: Resource | null;

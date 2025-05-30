@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
+
+import type { Resource } from "@/interfaces/resources";
 import {
   createResource,
+  deleteFile,
+  deleteResource,
   getResources,
   updateResource,
-  deleteResource,
   uploadFile,
-  deleteFile
-} from "../../lib/appwrite";
-import type { Resource } from "@/interfaces/resources";
-
+} from "./resourceService";
 
 // Hook para manejar los recursos
 export const useResources = () => {
@@ -37,13 +37,15 @@ export const useResources = () => {
   };
 
   // Función para agregar un nuevo recurso
-  const addResource = async (resourceData: Omit<Resource, "$id" | "createdAt"> & { file?: File }) => {
+  const addResource = async (
+    resourceData: Omit<Resource, "$id" | "createdAt"> & { file?: File }
+  ) => {
     try {
       setLoading(true);
-      
+
       // Extraer el archivo de resourceData para evitar enviarlo a la base de datos
       const { file, ...resourceDataWithoutFile } = resourceData;
-      
+
       // Si hay un archivo, subirlo primero
       let fileData = {};
       if (file) {
@@ -54,7 +56,7 @@ export const useResources = () => {
       // Crear el recurso con los datos del archivo
       const newResource = await createResource({
         ...resourceDataWithoutFile,
-        ...fileData
+        ...fileData,
       });
 
       setResources((prev) => [newResource as Resource, ...prev]);
@@ -69,7 +71,10 @@ export const useResources = () => {
   };
 
   // Función para actualizar un recurso por ID
-  const updateResourceById = async (id: string, resourceData: Partial<Resource> & { file?: File }) => {
+  const updateResourceById = async (
+    id: string,
+    resourceData: Partial<Resource> & { file?: File }
+  ) => {
     try {
       setLoading(true);
       if (!id) {
@@ -83,7 +88,7 @@ export const useResources = () => {
       let fileData = {};
       if (file) {
         // Eliminar el archivo anterior si existe
-        const resource = resources.find(r => r.$id === id);
+        const resource = resources.find((r) => r.$id === id);
         if (resource?.fileId) {
           await deleteFile(resource.fileId);
         }
@@ -96,7 +101,7 @@ export const useResources = () => {
       // Actualizar el recurso con los nuevos datos del archivo
       const updatedResource = await updateResource(id, {
         ...resourceDataWithoutFile,
-        ...fileData
+        ...fileData,
       });
 
       setResources((prev) =>
@@ -114,7 +119,6 @@ export const useResources = () => {
     }
   };
 
-
   // Función para eliminar un recurso por ID
   const deleteResourceById = async (id: string) => {
     try {
@@ -124,7 +128,7 @@ export const useResources = () => {
       }
 
       // Eliminar el archivo si existe
-      const resource = resources.find(r => r.$id === id);
+      const resource = resources.find((r) => r.$id === id);
       if (resource?.fileId) {
         await deleteFile(resource.fileId);
       }

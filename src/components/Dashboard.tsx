@@ -10,12 +10,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LogOut, Plus, Search, FileText } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
 import type { Resource } from "@/interfaces/resources";
 
 import ResourceForm from "../features/resources/ResourceForm";
 import ResourceCard from "../features/resources/ResourceCard";
 import { useResources } from "@/features/resources/useResources";
+import { useAuth } from "@/features/auth/useAuth";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();

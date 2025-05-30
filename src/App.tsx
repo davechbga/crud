@@ -1,10 +1,17 @@
 import { Toaster } from "./components/ui/sonner";
-import { AppRoutes } from "./app/routes";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 const App = () => {
   return (
     <>
       <Toaster />
-      <AppRoutes />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 };
