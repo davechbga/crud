@@ -10,6 +10,10 @@ import {
   uploadFile,
 } from "./resourceService";
 
+// Tipos
+type ResourceData = Omit<Resource, "$id" | "createdAt"> & { file?: File };
+type UpdateResourceData = Partial<Resource> & { file?: File };
+
 // Hook para manejar los recursos
 export const useResources = () => {
   const [resources, setResources] = useState<Resource[]>([]);
@@ -21,7 +25,7 @@ export const useResources = () => {
     fetchResources();
   }, []);
 
-  // Función para obtener los recursos al cargar el hook
+  // Función para obtener los recursos
   const fetchResources = async () => {
     try {
       setLoading(true);
@@ -36,24 +40,32 @@ export const useResources = () => {
     }
   };
 
+  // Función para manejar archivos
+  const handleFileUpload = async (file: File | undefined) => {
+    if (!file) return {};
+    const { fileId, fileUrl } = await uploadFile(file);
+    return { fileId, fileUrl };
+  };
+
+  // Función para manejar la eliminación de archivos
+  const handleFileDeletion = async (fileId: string | undefined) => {
+    if (fileId) {
+      await deleteFile(fileId);
+    }
+  };
+
   // Función para agregar un nuevo recurso
-  const addResource = async (
-    resourceData: Omit<Resource, "$id" | "createdAt"> & { file?: File }
-  ) => {
+  const addResource = async (resourceData: ResourceData) => {
     try {
       setLoading(true);
 
-      // Extraer el archivo de resourceData para evitar enviarlo a la base de datos
+      // Extraer el archivo de resourceData
       const { file, ...resourceDataWithoutFile } = resourceData;
 
-      // Si hay un archivo, subirlo primero
-      let fileData = {};
-      if (file) {
-        const { fileId, fileUrl } = await uploadFile(file);
-        fileData = { fileId, fileUrl };
-      }
+      // Subir archivo si existe
+      const fileData = await handleFileUpload(file);
 
-      // Crear el recurso con los datos del archivo
+      // Crear el recurso
       const newResource = await createResource({
         ...resourceDataWithoutFile,
         ...fileData,
@@ -70,35 +82,29 @@ export const useResources = () => {
     }
   };
 
-  // Función para actualizar un recurso por ID
-  const updateResourceById = async (
-    id: string,
-    resourceData: Partial<Resource> & { file?: File }
-  ) => {
+  // Función para actualizar un recurso
+  const updateResourceById = async (id: string, resourceData: UpdateResourceData) => {
     try {
       setLoading(true);
       if (!id) {
         throw new Error("Se requiere el ID del recurso para actualizar");
       }
 
-      // Extraer el archivo de resourceData para evitar enviarlo a la base de datos
+      // Extraer el archivo de resourceData
       const { file, ...resourceDataWithoutFile } = resourceData;
 
-      // Si hay un archivo nuevo, subirlo
+      // Manejar archivo si existe
       let fileData = {};
       if (file) {
-        // Eliminar el archivo anterior si existe
+        // Eliminar archivo anterior si existe
         const resource = resources.find((r) => r.$id === id);
-        if (resource?.fileId) {
-          await deleteFile(resource.fileId);
-        }
+        await handleFileDeletion(resource?.fileId);
 
-        // Subir el nuevo archivo
-        const { fileId, fileUrl } = await uploadFile(file);
-        fileData = { fileId, fileUrl };
+        // Subir nuevo archivo
+        fileData = await handleFileUpload(file);
       }
 
-      // Actualizar el recurso con los nuevos datos del archivo
+      // Actualizar el recurso
       const updatedResource = await updateResource(id, {
         ...resourceDataWithoutFile,
         ...fileData,
@@ -119,7 +125,7 @@ export const useResources = () => {
     }
   };
 
-  // Función para eliminar un recurso por ID
+  // Función para eliminar un recurso
   const deleteResourceById = async (id: string) => {
     try {
       setLoading(true);
@@ -127,11 +133,9 @@ export const useResources = () => {
         throw new Error("Se requiere el ID del recurso para eliminar");
       }
 
-      // Eliminar el archivo si existe
+      // Eliminar archivo si existe
       const resource = resources.find((r) => r.$id === id);
-      if (resource?.fileId) {
-        await deleteFile(resource.fileId);
-      }
+      await handleFileDeletion(resource?.fileId);
 
       // Eliminar el recurso
       await deleteResource(id);

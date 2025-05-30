@@ -1,5 +1,5 @@
-import AuthForm from "../features/auth/AuthForm";
-import Dashboard from "../components/Dashboard";
+import AuthForm from "../features/auth/components/AuthForm";
+import Dashboard from "../components/layout/Dashboard";
 import { AuthProvider, useAuth } from "@/features/auth/useAuth";
 
 const AppContent = () => {

@@ -9,7 +9,11 @@ import {
   STORAGE_BUCKET_ID,
 } from "@/lib/appwrite";
 
-// Funciones auxiliares para subir archivos
+// Tipos
+type ResourceData = Omit<Resource, "$id" | "createdAt">;
+type UpdateResourceData = Partial<Resource>;
+
+// Funciones auxiliares para manejo de archivos
 export const uploadFile = async (file: File) => {
   try {
     const response = await storage.createFile(
@@ -18,7 +22,6 @@ export const uploadFile = async (file: File) => {
       file
     );
 
-    // Obtener la URL del archivo usando getFileDownload en lugar de getFileView
     const fileUrl = storage.getFileDownload(STORAGE_BUCKET_ID, response.$id);
 
     return {
@@ -31,7 +34,6 @@ export const uploadFile = async (file: File) => {
   }
 };
 
-// Elimina un archivo por su ID
 export const deleteFile = async (fileId: string) => {
   try {
     await storage.deleteFile(STORAGE_BUCKET_ID, fileId);
@@ -41,36 +43,79 @@ export const deleteFile = async (fileId: string) => {
   }
 };
 
-// Funciones auxiliares para recursos
-export const createResource = async (
-  data: Omit<Resource, "$id" | "createdAt">
-) => {
+// Funciones auxiliares para manejo de recursos
+const getCurrentUser = async () => {
   try {
-    // Obtener el usuario actual primero
-    const currentUser = await account.get();
+    return await account.get();
+  } catch (error) {
+    console.error("Error al obtener el usuario actual:", error);
+    throw error;
+  }
+};
 
-    // Asegurarse de que el usuario actual tenga un ID
-    const response = await databases.createDocument(
+const createDocument = async (data: ResourceData & { createdAt: string; userId: string }) => {
+  try {
+    return await databases.createDocument(
       DATABASE_ID,
       RESOURCES_COLLECTION_ID,
       ID.unique(),
-      {
-        ...data,
-        createdAt: new Date().toISOString(),
-        userId: currentUser.$id, // Usar el ID del usuario actual
-      }
+      data
     );
-    return response as unknown as Resource;
+  } catch (error) {
+    console.error("Error al crear el documento:", error);
+    throw error;
+  }
+};
+
+const updateDocument = async (id: string, data: UpdateResourceData) => {
+  try {
+    // Eliminar valores undefined o null de los datos de actualización
+    const updateData = Object.fromEntries(
+      Object.entries(data).filter(
+        ([, value]) => value !== undefined && value !== null
+      )
+    );
+
+    return await databases.updateDocument(
+      DATABASE_ID,
+      RESOURCES_COLLECTION_ID,
+      id,
+      updateData
+    );
+  } catch (error) {
+    console.error("Error al actualizar el documento:", error);
+    throw error;
+  }
+};
+
+const deleteDocument = async (id: string) => {
+  try {
+    await databases.deleteDocument(DATABASE_ID, RESOURCES_COLLECTION_ID, id);
+  } catch (error) {
+    console.error("Error al eliminar el documento:", error);
+    throw error;
+  }
+};
+
+// Funciones principales para manejo de recursos
+export const createResource = async (data: ResourceData) => {
+  try {
+    const currentUser = await getCurrentUser();
+    const resourceData = {
+      ...data,
+      createdAt: new Date().toISOString(),
+      userId: currentUser.$id,
+    };
+    return await createDocument(resourceData) as unknown as Resource;
   } catch (error) {
     console.error("Error al crear el recurso:", error);
     throw error;
   }
 };
 
-// Funciones para manejar recursos
 export const getResources = async () => {
   try {
-    const currentUser = await account.get();
+    const currentUser = await getCurrentUser();
     const response = await databases.listDocuments(
       DATABASE_ID,
       RESOURCES_COLLECTION_ID,
@@ -83,37 +128,24 @@ export const getResources = async () => {
   }
 };
 
-// Actualiza un recurso existente
-export const updateResource = async (id: string, data: Partial<Resource>) => {
+export const updateResource = async (id: string, data: UpdateResourceData) => {
   try {
     if (!id) {
       throw new Error("El ID del documento es requerido para actualizar");
     }
-
-    // Eliminar valores undefined o null de los datos de actualización
-    const updateData = Object.fromEntries(
-      Object.entries(data).filter(
-        ([, value]) => value !== undefined && value !== null
-      )
-    );
-
-    const response = await databases.updateDocument(
-      DATABASE_ID,
-      RESOURCES_COLLECTION_ID,
-      id,
-      updateData
-    );
-    return response as unknown as Resource;
+    return await updateDocument(id, data) as unknown as Resource;
   } catch (error) {
     console.error("Error al actualizar el recurso:", error);
     throw error;
   }
 };
 
-// Elimina un recurso por su ID
 export const deleteResource = async (id: string) => {
   try {
-    await databases.deleteDocument(DATABASE_ID, RESOURCES_COLLECTION_ID, id);
+    if (!id) {
+      throw new Error("El ID del documento es requerido para eliminar");
+    }
+    await deleteDocument(id);
   } catch (error) {
     console.error("Error al eliminar el recurso:", error);
     throw error;

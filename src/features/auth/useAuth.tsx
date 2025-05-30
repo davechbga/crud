@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { User } from "@/interfaces/auth";
 import { account, ID } from "@/lib/appwrite";
 
+// Tipos
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
@@ -15,9 +16,14 @@ interface AuthContextType {
   loading: boolean;
 }
 
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+// Contexto de autenticación
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// eslint-disable-next-line react-refresh/only-export-components
+// Hook personalizado para usar el contexto de autenticación
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -26,27 +32,28 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+// Función para formatear los datos del usuario
+const formatUserData = (userData: any): User => ({
+  id: userData.$id,
+  email: userData.email,
+  fullName: userData.name || userData.email.split("@")[0],
+});
 
+// Proveedor de autenticación
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Verificar el estado de autenticación al cargar
   useEffect(() => {
     checkUser();
   }, []);
 
-  // Función para verificar si el usuario ya está autenticado
+  // Verificar si el usuario está autenticado
   const checkUser = async () => {
     try {
       const userData = await account.get();
-      setUser({
-        id: userData.$id,
-        email: userData.email,
-        fullName: userData.name || userData.email.split("@")[0],
-      });
+      setUser(formatUserData(userData));
     } catch (error) {
       console.error("Error al obtener el usuario actual:", error);
       setUser(null);
@@ -55,23 +62,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Función para iniciar sesión
+  // Iniciar sesión
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      // Creamos una sesión de email y contraseña
       const session = await account.createEmailPasswordSession(email, password);
       console.log("Sesión creada:", session);
 
-      // Si la sesión se crea correctamente, obtenemos los datos del usuario
       const userData = await account.get();
       console.log("Datos del usuario:", userData);
 
-      setUser({
-        id: userData.$id,
-        email: userData.email,
-        fullName: userData.name || userData.email.split("@")[0],
-      });
+      setUser(formatUserData(userData));
     } catch (error) {
       console.error("Error en login:", error);
       throw new Error("Error al iniciar sesión");
@@ -80,7 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Función para registrar un nuevo usuario
+  // Registrar un nuevo usuario
   const register = async (
     email: string,
     password: string,
@@ -88,9 +89,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ) => {
     setLoading(true);
     try {
-      // Crear el usuario con un ID único generado por Appwrite
       const user = await account.create(ID.unique(), email, password, fullName);
-      console.log("User created:", user);
+      console.log("Usuario creado:", user);
 
       // No iniciamos sesión automáticamente
       setUser(null);
@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Función para cerrar sesión
+  // Cerrar sesión
   const logout = async () => {
     try {
       await account.deleteSession("current");

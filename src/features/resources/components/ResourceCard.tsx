@@ -8,24 +8,20 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { FileText, Calendar, Trash, Plus, Pencil, Link } from "lucide-react";
+import { FileText, Calendar, Link } from "lucide-react";
 import { toast } from "sonner";
 import type { Resource } from "@/interfaces/resources";
 import { formatDate } from "@/lib/utils";
+import { ResourceActions } from "./ResourceActions";
+import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+
+// Constantes
+const CATEGORY_COLORS = {
+  Documentación: "bg-blue-100 text-blue-800",
+  Herramientas: "bg-green-100 text-green-800",
+  Tutoriales: "bg-purple-100 text-purple-800",
+  Referencias: "bg-orange-100 text-orange-800",
+} as const;
 
 interface ResourceCardProps {
   resource: Resource;
@@ -58,24 +54,17 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     if (resource.linkUrl) {
       window.open(resource.linkUrl, "_blank");
     } else if (resource.fileUrl) {
-      // Abrir archivo en una nueva pestaña
       const fileUrl = `${resource.fileUrl}&mode=admin`;
       window.open(fileUrl, "_blank");
-
       toast("Archivo abierto", {});
     }
   };
 
-  // Funcion para obtener el color de la categoría
+  // Obtener el color de la categoría
   const getCategoryColor = (category: string) => {
-    const colors = {
-      Documentación: "bg-blue-100 text-blue-800",
-      Herramientas: "bg-green-100 text-green-800",
-      Tutoriales: "bg-purple-100 text-purple-800",
-      Referencias: "bg-orange-100 text-orange-800",
-    };
     return (
-      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
+      CATEGORY_COLORS[category as keyof typeof CATEGORY_COLORS] ||
+      "bg-gray-100 text-gray-800"
     );
   };
 
@@ -87,26 +76,10 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
             <CardTitle className="text-lg font-medium leading-6 mb-2">
               {resource.title}
             </CardTitle>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white z-50">
-                <DropdownMenuItem onClick={() => onEdit(resource)}>
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Editar
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleDelete}
-                  className="text-red-600"
-                >
-                  <Trash className="h-4 w-4 mr-2 text-red-600" />
-                  Eliminar
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ResourceActions
+              onEdit={() => onEdit(resource)}
+              onDelete={handleDelete}
+            />
           </div>
           <Badge className={`w-fit ${getCategoryColor(resource.category)}`}>
             {resource.category}
@@ -142,28 +115,11 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
         </CardFooter>
       </Card>
 
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>¿Eliminar recurso?</DialogTitle>
-            <DialogDescription>
-              ¿Estás seguro de que deseas eliminar este recurso? Esta acción no
-              se puede deshacer.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              Eliminar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </>
   );
 };
