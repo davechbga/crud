@@ -17,31 +17,35 @@ Aplicación CRUD desarrollada con **React + TypeScript + Appwrite** para la gest
 ```
 📁 src
 │
-├── 📁 app
-│   └── routes.tsx           ← Rutas de la aplicación
 │
 ├── 📁 components           ← Componentes
-│   └── ui/                 ← Componentes UI reutilizables (shadcn/ui)
+│   ├── 📁 ui               ← Componentes UI reutilizables (shadcn/ui)
+│   └── 📁 dashboard        ← Componentes de panel
 │
 ├── 📁 features
 │   ├── 📁 auth
-│   │    ├── AuthForm.tsx    ← Formulario de autenticación
-│   │    ├── authService.ts  ← Appwrite service para autenticación
-│   │    └── useAuth.ts      ← Hook para manejar autenticación
+│   │    ├── 📁 components    ← Componentes de autenticación
+│   │    ├── authService.ts   ← Appwrite service para autenticación
+│   │    └── useAuth.ts       ← Hook para manejar autenticación
+│   │
 │   └── 📁 resources
-│        ├── ResourceForm.tsx ← Formulario para recursos
-│        ├── ResourceCard.ts  ← Appwrite service para recursos
-│        └── useResources.ts  ← Hook para manejar recursos
+│        ├── 📁 components       ← Componentes de recursos
+│        ├── resourceService.ts  ← Appwrite service para recursos
+│        └── useResources.ts     ← Hook para manejar recursos
+│
+├── 📁 interfaces          ← Interfaces y tipos TypeScript
 │
 ├── 📁 lib
-│   └── appwrite.ts        ← Conexión a Appwrite y configuración
+│   │── appwrite.ts        ← Conexión a Appwrite y configuración
+│   └── lib.ts             ← Funciones utilitarias
 │
-├── 📁 styles
-│   ├── global.css        ← Estilos globales
-│   └── app.css           ← Estilos específicos de la aplicación
+├── 📁 pages
+│   ├── Index.tsx           ← Página de inicio
+│   └── NotFound.tsx        ← Página 404
 │
+├── index.css            ← Archivo de estilos globales
 ├── App.tsx              ← Componente principal de la aplicación
-└── main.tsx            ← Punto de entrada de la aplicación
+└── main.tsx             ← Punto de entrada de la aplicación
 ```
 
 ## ⚙️ Instrucciones para Correr el Proyecto Localmente
@@ -60,8 +64,8 @@ npm install
 ```
 
 3. **Configurar variables de entorno:**
-NOTA: SE INCLUYE DENTRO DE REPOSITORIO CREDENCIALES DE APPWRITE PARA QUE PUEDAS PROBARLO DIRECTAMENTE.
-Crea un archivo `.env` en la raíz del proyecto con los siguientes valores:
+   NOTA: SE INCLUYE DENTRO DE REPOSITORIO CREDENCIALES DE APPWRITE PARA QUE PUEDAS PROBARLO DIRECTAMENTE.
+   Crea un archivo `.env` en la raíz del proyecto con los siguientes valores:
 
 ```env
 VITE_APPWRITE_ENDPOINT=https://<tu-endpoint-appwrite>
@@ -93,7 +97,7 @@ http://localhost:5173
 ## 🧠 Buenas Prácticas
 
 - Código modular y limpio
-- Separación lógica por feature
+- Separación lógica y componentes por feature
 - Uso de tipado fuerte con TypeScript
 - Composición con Hooks
 - Feedback inmediato al usuario con notificaciones
