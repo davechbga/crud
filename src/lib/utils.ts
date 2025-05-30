@@ -12,3 +12,8 @@ export const formatDate = (dateString: string) => {
     day: "numeric",
   });
 };
+
+export const handleAuthError = (error: unknown, operation: string): never => {
+  console.error(`Error en ${operation}:`, error);
+  throw error;
+};

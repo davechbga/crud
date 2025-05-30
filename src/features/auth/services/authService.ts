@@ -1,24 +1,6 @@
 import type { User } from "@/interfaces/auth";
-import { account, ID } from "../../lib/appwrite";
-
-// Tipos
-interface UserData {
-  $id: string;
-  email: string;
-  name?: string;
-}
-
-// Funciones auxiliares
-const formatUserData = (userData: UserData): User => ({
-  id: userData.$id,
-  email: userData.email,
-  fullName: userData.name || userData.email.split("@")[0],
-});
-
-const handleAuthError = (error: unknown, operation: string): never => {
-  console.error(`Error en ${operation}:`, error);
-  throw error;
-};
+import { account, ID } from "@/lib/appwrite";
+import { handleAuthError } from "@/lib/utils";
 
 // Servicio de autenticación para manejar el registro, inicio de sesión y obtención del usuario actual
 export const authService = {
@@ -26,7 +8,7 @@ export const authService = {
   async getCurrentUser(): Promise<User | null> {
     try {
       const userData = await account.get();
-      return formatUserData(userData);
+      return userData;
     } catch (error) {
       console.error("Error al obtener el usuario actual:", error);
       return null;
@@ -38,7 +20,7 @@ export const authService = {
     try {
       await account.createEmailPasswordSession(email, password);
       const userData = await account.get();
-      return formatUserData(userData);
+      return userData;
     } catch (error) {
       return handleAuthError(error, "inicio de sesión");
     }

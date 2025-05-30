@@ -9,7 +9,7 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { useAuth } from "../useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { AuthHeader } from "./Header";
 import { LoginForm } from "./LoginForm";
 import { RegisterForm } from "./RegisterForm";

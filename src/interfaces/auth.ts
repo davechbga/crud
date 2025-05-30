@@ -1,7 +1,7 @@
 export interface User {
-  id: string;
+  $id: string;
   email: string;
-  fullName: string;
+  fullName?: string;
 }
 
 export interface LoginData {

@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 
 // Componente para el encabezado
 interface HeaderUser {
-  fullName: string;
+  fullName?: string;
 }
 
 export const Header = ({

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 
 import { toast } from "sonner";
 import type { Resource } from "@/interfaces/resources";
-import { useAuth } from "../../auth/useAuth";
+import { useAuth } from "../../auth/hooks/useAuth";
 import { TitleField } from "./TitleField";
 import { DescriptionField } from "./DescriptionField";
 import { CategoryField } from "./CategoryField";
@@ -104,7 +104,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       !formData.title.trim() ||
       !formData.description.trim() ||
       !formData.category ||
-      !user?.id
+      !user?.$id
     ) {
       toast.error("Error de validación", {
         description: "Por favor completa todos los campos obligatorios.",
@@ -117,7 +117,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category,
-      userId: user.id,
+      userId: user.$id,
       ...(attachmentType === "link" && formData.linkUrl
         ? { linkUrl: formData.linkUrl.trim() }
         : { linkUrl: undefined }),

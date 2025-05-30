@@ -8,7 +8,7 @@ import {
   getResources,
   updateResource,
   uploadFile,
-} from "./resourceService";
+} from "../services/resourceService";
 
 // Tipos
 type ResourceData = Omit<Resource, "$id" | "createdAt"> & { file?: File };

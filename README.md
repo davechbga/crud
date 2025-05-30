@@ -25,13 +25,13 @@ Aplicación CRUD desarrollada con **React + TypeScript + Appwrite** para la gest
 ├── 📁 features
 │   ├── 📁 auth
 │   │    ├── 📁 components    ← Componentes de autenticación
-│   │    ├── authService.ts   ← Appwrite service para autenticación
-│   │    └── useAuth.ts       ← Hook para manejar autenticación
+│   │    ├── 📁 hooks         ← Hooks relacionados con autenticación
+│   │    └── 📁 services      ← Servicios de autenticación
 │   │
 │   └── 📁 resources
 │        ├── 📁 components       ← Componentes de recursos
-│        ├── resourceService.ts  ← Appwrite service para recursos
-│        └── useResources.ts     ← Hook para manejar recursos
+│        ├── 📁 hooks            ← Hooks relacionados con recursos
+│        └── 📁 services         ← Servicios de recursos
 │
 ├── 📁 interfaces          ← Interfaces y tipos TypeScript
 │

@@ -1,6 +1,6 @@
 import Dashboard from "@/components/dashboard/Dashboard";
 import AuthForm from "../features/auth/components/AuthForm";
-import { AuthProvider, useAuth } from "@/features/auth/useAuth";
+import { AuthProvider, useAuth } from "@/features/auth/hooks/useAuth";
 
 const AppContent = () => {
   const { user } = useAuth();
