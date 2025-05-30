@@ -22,6 +22,7 @@ const AuthForm = () => {
     fullName: "",
   });
 
+  // Maneja el inicio de sesión del usuario
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {

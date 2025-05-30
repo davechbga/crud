@@ -102,7 +102,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
 
     onSubmit(submitData);
 
-    toast(resource ? "Recurso actualizado" : "Recurso creado", {
+    toast.success(resource ? "Recurso actualizado" : "Recurso creado", {
       description: resource
         ? "El recurso ha sido actualizado correctamente."
         : "El nuevo recurso ha sido agregado correctamente.",

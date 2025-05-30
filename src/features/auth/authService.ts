@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { User } from "@/interfaces/auth";
 import { account, ID } from "../../lib/appwrite";
 
@@ -13,6 +12,7 @@ export const authService = {
         fullName: userData.name || userData.email.split("@")[0],
       };
     } catch (error) {
+      console.error("Error al obtener el usuario actual:", error);
       return null;
     }
   },

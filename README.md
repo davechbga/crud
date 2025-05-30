@@ -15,26 +15,33 @@ Aplicación CRUD desarrollada con **React + TypeScript + Appwrite** para la gest
 ## 🧱 Estructura del Proyecto
 
 ```
-src/
-├── components/
-├── contexts/
-│   └── AuthContext.tsx
-├── features/
-│   ├── auth/
-│   │   ├── AuthForm.tsx
-│   │   ├── authService.ts
-│   │   └── useAuth.ts
-│   └── resources/
-│       ├── ResourceCard.tsx
-│       ├── ResourceForm.tsx
-│       └── useResources.tsx
-├── lib/
-│   └── appwrite.ts
-├── pages/
-│   └── Index.tsx
-│   └── NotFound.tsx
-│   App.tsx
-└── main.tsx
+📁 src
+│
+├── 📁 app
+│   └── routes.tsx           ← Rutas de la aplicación
+│
+├── 📁 components           ← Componentes
+│   └── ui/                 ← Componentes UI reutilizables (shadcn/ui)
+│
+├── 📁 features
+│   ├── 📁 auth
+│   │    ├── AuthForm.tsx    ← Formulario de autenticación
+│   │    ├── authService.ts  ← Appwrite service para autenticación
+│   │    └── useAuth.ts      ← Hook para manejar autenticación
+│   └── 📁 resources
+│        ├── ResourceForm.tsx ← Formulario para recursos
+│        ├── ResourceCard.ts  ← Appwrite service para recursos
+│        └── useResources.ts  ← Hook para manejar recursos
+│
+├── 📁 lib
+│   └── appwrite.ts        ← Conexión a Appwrite y configuración
+│
+├── 📁 styles
+│   ├── global.css        ← Estilos globales
+│   └── app.css           ← Estilos específicos de la aplicación
+│
+├── App.tsx              ← Componente principal de la aplicación
+└── main.tsx            ← Punto de entrada de la aplicación
 ```
 
 ## ⚙️ Instrucciones para Correr el Proyecto Localmente
@@ -82,12 +89,6 @@ http://localhost:5173
 - Validación de formularios
 - Manejo de errores y feedback al usuario
 - Código organizado por módulos y características
-
-## 📁 Recomendaciones
-
-- Usa cuentas válidas para probar la autenticación.
-- Verifica que tu Appwrite esté corriendo y accesible desde el frontend.
-- Si usas Appwrite local, configura correctamente tu archivo `hosts`.
 
 ## 🧠 Buenas Prácticas
 

@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState, useEffect } from 'react';
-import { authService } from './authService';
-import type { User } from '@/interfaces/auth';
+import { useState, useEffect } from "react";
+import { authService } from "./authService";
+import type { User } from "@/interfaces/auth";
 
 // Hook para manejar la autenticación del usuario
 export const useAuth = () => {
@@ -18,6 +17,7 @@ export const useAuth = () => {
       const userData = await authService.getCurrentUser();
       setUser(userData);
     } catch (error) {
+      console.error("Error al obtener el usuario actual:", error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -31,21 +31,26 @@ export const useAuth = () => {
       const userData = await authService.login(email, password);
       setUser(userData);
     } catch (error) {
-      throw new Error('Error al iniciar sesión');
+      console.error("Error al iniciar sesión:", error);
+      throw new Error("Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
   };
 
-
   // Método para registrar un nuevo usuario
-  const register = async (email: string, password: string, fullName: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    fullName: string
+  ) => {
     setLoading(true);
     try {
       await authService.register(email, password, fullName);
       setUser(null);
     } catch (error) {
-      throw new Error('Error al registrar usuario');
+      console.error("Error al registrar usuario:", error);
+      throw new Error("Error al registrar usuario");
     } finally {
       setLoading(false);
     }
@@ -56,7 +61,7 @@ export const useAuth = () => {
       await authService.logout();
       setUser(null);
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      console.error("Error al cerrar sesión:", error);
     }
   };
 
@@ -65,6 +70,6 @@ export const useAuth = () => {
     login,
     register,
     logout,
-    loading
+    loading,
   };
-}; 
+};
