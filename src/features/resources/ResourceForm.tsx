@@ -23,7 +23,9 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface ResourceFormProps {
   resource?: Resource | null;
-  onSubmit: (data: Omit<Resource, "$id" | "createdAt"> & { file?: File }) => void;
+  onSubmit: (
+    data: Omit<Resource, "$id" | "createdAt"> & { file?: File }
+  ) => void;
   onCancel: () => void;
   categories: string[];
 }
@@ -87,7 +89,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
         : { linkUrl: undefined }),
       ...(attachmentType === "file" && selectedFile
         ? { file: selectedFile }
-        : {})
+        : {}),
     };
 
     // Si estamos editando un recurso existente, asegurarse de que tengamos el ID
@@ -120,13 +122,13 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       // Validar el tipo de archivo
-      if (file.type !== 'application/pdf') {
+      if (file.type !== "application/pdf") {
         toast.error("Error", {
           description: "Solo se permiten archivos PDF.",
         });
         return;
       }
-      
+
       // Validar el tamaño del archivo (máx 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error("Error", {
@@ -136,9 +138,9 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       }
 
       setSelectedFile(file);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        fileUrl: file.name
+        fileUrl: file.name,
       }));
     }
   };
@@ -228,8 +230,18 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                   onChange={handleFileChange}
                 />
                 {formData.fileUrl && (
-                  <p className="text-sm text-gray-600">
-                    Archivo: {formData.fileUrl}
+                  <p
+                    className="text-sm text-gray-600 max-w-[220px] truncate"
+                    title={formData.fileUrl}
+                  >
+                    Archivo:{" "}
+                    <a
+                      target="_blank"
+                      href={formData.fileUrl}
+                      className="text-blue-600 hover:underline"
+                    >
+                      {formData.fileUrl}
+                    </a>
                   </p>
                 )}
               </TabsContent>
