@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { AuthHeader } from "@/features/auth/components/Header";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 const VerifyEmailPage = () => {
-  const { verifyEmail, loading, user } = useAuth();
+  const { verifyEmail, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [verificationStatus, setVerificationStatus] = useState<"pending" | "success" | "error">("pending");
+  const [verificationStatus, setVerificationStatus] = useState<
+    "pending" | "success" | "error"
+  >("pending");
   const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
@@ -19,7 +27,7 @@ const VerifyEmailPage = () => {
 
     // Verificar si ya se realizó la verificación
     const hasVerified = localStorage.getItem(verificationKey);
-    
+
     if (userId && secret && !isVerifying && !hasVerified) {
       handleVerification(userId, secret, verificationKey);
     } else if (hasVerified) {
@@ -30,22 +38,27 @@ const VerifyEmailPage = () => {
         navigate("/login");
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, user]);
 
-  const handleVerification = async (userId: string, secret: string, verificationKey: string) => {
+  const handleVerification = async (
+    userId: string,
+    secret: string,
+    verificationKey: string
+  ) => {
     if (isVerifying) return;
-    
+
     setIsVerifying(true);
     try {
       await verifyEmail(userId, secret);
       setVerificationStatus("success");
       // Marcar como verificado en localStorage
       localStorage.setItem(verificationKey, "true");
-      
+
       toast.success("¡Correo verificado!", {
         description: "Tu correo ha sido verificado exitosamente.",
       });
-      
+
       // Si el usuario ya está autenticado, redirigir al dashboard
       if (user) {
         navigate("/dashboard");
@@ -57,7 +70,8 @@ const VerifyEmailPage = () => {
       console.error("Error al verificar el correo:", error);
       setVerificationStatus("error");
       toast.error("Error de verificación", {
-        description: "No se pudo verificar tu correo. Por favor, intenta de nuevo.",
+        description:
+          "No se pudo verificar tu correo. Por favor, intenta de nuevo.",
       });
     } finally {
       setIsVerifying(false);
@@ -72,8 +86,10 @@ const VerifyEmailPage = () => {
           <CardHeader className="text-center">
             <CardTitle>Verificación de Correo</CardTitle>
             <CardDescription>
-              {verificationStatus === "pending" && "Verificando tu correo electrónico..."}
-              {verificationStatus === "success" && "¡Correo verificado exitosamente!"}
+              {verificationStatus === "pending" &&
+                "Verificando tu correo electrónico..."}
+              {verificationStatus === "success" &&
+                "¡Correo verificado exitosamente!"}
               {verificationStatus === "error" && "Error al verificar el correo"}
             </CardDescription>
           </CardHeader>
@@ -107,4 +123,4 @@ const VerifyEmailPage = () => {
   );
 };
 
-export default VerifyEmailPage; 
+export default VerifyEmailPage;

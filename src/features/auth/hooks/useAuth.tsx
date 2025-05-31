@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { User } from "@/interfaces/auth";
-import { account } from "@/lib/appwrite";
 import { authService } from "../services/authService";
 
 // Tipos

@@ -86,8 +86,6 @@ const Dashboard = () => {
                 resource={resource}
                 onEdit={handleEdit}
                 onDelete={deleteResource}
-                isUpdating={loading.updating[resource.$id]}
-                isDeleting={loading.deleting[resource.$id]}
               />
             ))}
           </div>
@@ -111,7 +109,6 @@ const Dashboard = () => {
             setEditingResource(null);
           }}
           categories={CATEGORIES}
-          isSubmitting={loading.creating || (editingResource && loading.updating[editingResource.$id])}
         />
       )}
     </div>
