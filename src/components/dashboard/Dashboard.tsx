@@ -8,7 +8,7 @@ import { Header } from "./Header";
 import { StatsPanel } from "./StatsPanel";
 import { SearchControls } from "./Filters";
 import { EmptyResources } from "./EmptyResources";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Constantes
 const CATEGORIES = [
@@ -61,7 +61,7 @@ const Dashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <StatsPanel resources={resources} />
+          <StatsPanel resources={resources} loading={loading.fetching} />
         </div>
 
         <div className="mb-6">
@@ -75,8 +75,26 @@ const Dashboard = () => {
         </div>
 
         {loading.fetching ? (
-          <div className="flex justify-center items-center py-12">
-            <Spinner size="lg" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="bg-white rounded-xl border p-6 space-y-4">
+                <div className="flex items-start justify-between">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-20" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-4/6" />
+                </div>
+                <div className="flex items-center">
+                  <Skeleton className="h-3 w-3 mr-1" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-9 w-full" />
+              </div>
+            ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

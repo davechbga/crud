@@ -20,6 +20,12 @@ const NO_FILE_ID = "no-file";
 export const resourceService = {
   async uploadFile(file: File) {
     try {
+      if (!file) {
+        return {
+          fileId: NO_FILE_ID,
+          fileUrl: "",
+        };
+      }
       const response = await storage.createFile(
         STORAGE_BUCKET_ID,
         ID.unique(),
@@ -43,7 +49,16 @@ export const resourceService = {
       // No intentar eliminar si no hay fileId o si es el ID especial "no-file"
       if (!fileId || fileId === NO_FILE_ID) return;
       
-      await storage.deleteFile(STORAGE_BUCKET_ID, fileId);
+      try {
+        await storage.deleteFile(STORAGE_BUCKET_ID, fileId);
+      } catch (error: any) {
+        // Si el archivo no existe, lo ignoramos
+        if (error?.code === 404) {
+          console.log("El archivo ya no existe en el almacenamiento");
+          return;
+        }
+        throw error;
+      }
     } catch (error) {
       console.error("Error al eliminar el archivo:", error);
       throw error;
@@ -93,13 +108,18 @@ export const resourceService = {
   async updateResource(id: string, data: UpdateResourceData) {
     try {
       if (!id) throw new Error("ID requerido");
+      
+      // Preparar los datos de actualización
       const updateData = {
         ...data,
         // Asegurarse de que los campos undefined no sobrescriban valores existentes
         ...Object.fromEntries(
           Object.entries(data).filter(([, value]) => value !== undefined)
         ),
+        // Asegurarse de que fileId siempre esté presente
+        fileId: data.fileId || NO_FILE_ID,
       };
+
       return (await databases.updateDocument(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,

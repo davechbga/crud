@@ -6,6 +6,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 import { toast } from "sonner";
 import type { Resource } from "@/interfaces/resources";
@@ -43,7 +45,6 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     fileUrl: "",
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [attachmentType, setAttachmentType] = useState<"link" | "file">("link");
 
   // Cargar datos del recurso si se está editando
   useEffect(() => {
@@ -55,7 +56,6 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
         linkUrl: resource.linkUrl || "",
         fileUrl: resource.fileUrl || "",
       });
-      setAttachmentType(resource.linkUrl ? "link" : "file");
     }
   }, [resource]);
 
@@ -92,6 +92,12 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
         ...prev,
         fileUrl: file.name,
       }));
+    } else {
+      setSelectedFile(null);
+      setFormData((prev) => ({
+        ...prev,
+        fileUrl: "",
+      }));
     }
   };
 
@@ -112,18 +118,14 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       return;
     }
 
-    // Preparar los datos según el tipo de adjunto
+    // Preparar los datos
     const submitData: Omit<Resource, "$id" | "createdAt"> & { file?: File } = {
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category,
       userId: user.$id,
-      ...(attachmentType === "link" && formData.linkUrl
-        ? { linkUrl: formData.linkUrl.trim() }
-        : { linkUrl: undefined }),
-      ...(attachmentType === "file" && selectedFile
-        ? { file: selectedFile }
-        : {}),
+      linkUrl: formData.linkUrl.trim() || undefined,
+      ...(selectedFile ? { file: selectedFile } : {}),
     };
 
     // Si estamos editando un recurso existente, asegurarse de que tengamos el ID
@@ -169,14 +171,33 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
             categories={categories}
           />
 
-          <AttachmentField
-            attachmentType={attachmentType}
-            setAttachmentType={setAttachmentType}
-            linkUrl={formData.linkUrl}
-            onLinkChange={(value) => handleInputChange("linkUrl", value)}
-            onFileChange={handleFileChange}
-            fileUrl={formData.fileUrl}
-          />
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <Label>Enlace Web (opcional)</Label>
+              <Input
+                id="linkUrl"
+                type="url"
+                value={formData.linkUrl}
+                onChange={(e) => handleInputChange("linkUrl", e.target.value)}
+                placeholder="https://ejemplo.com/recurso"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <Label>Archivo PDF (opcional)</Label>
+              <Input 
+                id="fileUrl" 
+                type="file" 
+                accept=".pdf" 
+                onChange={handleFileChange} 
+              />
+              {formData.fileUrl && (
+                <p className="text-sm text-gray-600">
+                  Archivo seleccionado: {formData.fileUrl}
+                </p>
+              )}
+            </div>
+          </div>
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onCancel}>

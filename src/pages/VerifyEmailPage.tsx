@@ -10,6 +10,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { AuthHeader } from "@/features/auth/components/Header";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const VerifyEmailPage = () => {
   const { verifyEmail, user } = useAuth();
@@ -95,9 +96,9 @@ const VerifyEmailPage = () => {
           </CardHeader>
           <CardContent className="text-center">
             {verificationStatus === "pending" && (
-              <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-3/4 mx-auto" />
+                <Skeleton className="h-4 w-1/2 mx-auto" />
               </div>
             )}
             {verificationStatus === "success" && (

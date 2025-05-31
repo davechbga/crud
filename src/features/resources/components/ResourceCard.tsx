@@ -49,17 +49,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     });
   };
 
-  // Manejar la apertura del recurso
-  const handleOpenResource = () => {
-    if (resource.linkUrl) {
-      window.open(resource.linkUrl, "_blank");
-    } else if (resource.fileUrl) {
-      const fileUrl = `${resource.fileUrl}&mode=admin`;
-      window.open(fileUrl, "_blank");
-      toast("Archivo abierto", {});
-    }
-  };
-
   // Obtener el color de la categoría
   const getCategoryColor = (category: string) => {
     return (
@@ -97,21 +86,34 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
           </div>
         </CardContent>
 
-        <CardFooter className="pt-0">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleOpenResource}
-            className="w-full"
-            disabled={!resource.linkUrl && !resource.fileUrl}
-          >
-            {resource.linkUrl ? (
+        <CardFooter className="flex flex-col pt-0 space-y-2">
+          {resource.linkUrl && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(resource.linkUrl, "_blank")}
+              className="w-full"
+            >
               <Link className="h-4 w-4 mr-2" />
-            ) : (
+              Abrir Enlace
+            </Button>
+          )}
+
+          {resource.fileUrl && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const fileUrl = resource.fileUrl;
+                window.open(fileUrl, "_blank");
+                toast("Archivo abierto", {});
+              }}
+              className="w-full"
+            >
               <FileText className="h-4 w-4 mr-2" />
-            )}
-            {resource.linkUrl ? "Abrir Enlace" : "Ver Archivo"}
-          </Button>
+              Ver Archivo
+            </Button>
+          )}
         </CardFooter>
       </Card>
 

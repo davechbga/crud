@@ -1,9 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Resource } from "@/interfaces/resources";
 import { FileText } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface StatsPanelProps {
+  resources: Resource[];
+  loading?: boolean;
+}
 
 // Componente para el panel de estadísticas
-export const StatsPanel = ({ resources }: { resources: Resource[] }) => {
+export const StatsPanel = ({ resources, loading = false }: StatsPanelProps) => {
   const recentResources = resources.filter((r) => {
     const today = new Date();
     const resourceDate = new Date(r.createdAt);
@@ -23,22 +29,49 @@ export const StatsPanel = ({ resources }: { resources: Resource[] }) => {
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {resources.length}
-            </div>
-            <div className="text-sm text-gray-600">Total de Recursos</div>
+            {loading ? (
+              <>
+                <Skeleton className="h-8 w-16 mx-auto mb-2" />
+                <Skeleton className="h-4 w-32 mx-auto" />
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-blue-600">
+                  {resources.length}
+                </div>
+                <div className="text-sm text-gray-600">Total de Recursos</div>
+              </>
+            )}
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {new Set(resources.map((r) => r.category)).size}
-            </div>
-            <div className="text-sm text-gray-600">Categorías</div>
+            {loading ? (
+              <>
+                <Skeleton className="h-8 w-16 mx-auto mb-2" />
+                <Skeleton className="h-4 w-32 mx-auto" />
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-green-600">
+                  {new Set(resources.map((r) => r.category)).size}
+                </div>
+                <div className="text-sm text-gray-600">Categorías</div>
+              </>
+            )}
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              {recentResources.length}
-            </div>
-            <div className="text-sm text-gray-600">Recientes (7 días)</div>
+            {loading ? (
+              <>
+                <Skeleton className="h-8 w-16 mx-auto mb-2" />
+                <Skeleton className="h-4 w-32 mx-auto" />
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-purple-600">
+                  {recentResources.length}
+                </div>
+                <div className="text-sm text-gray-600">Recientes (7 días)</div>
+              </>
+            )}
           </div>
         </div>
       </CardContent>
