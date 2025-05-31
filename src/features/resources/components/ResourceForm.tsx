@@ -15,7 +15,6 @@ import { useAuth } from "../../auth/hooks/useAuth";
 import { TitleField } from "./TitleField";
 import { DescriptionField } from "./DescriptionField";
 import { CategoryField } from "./CategoryField";
-import { AttachmentField } from "./AttachField";
 
 // Constantes
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -185,11 +184,11 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
 
             <div className="space-y-4">
               <Label>Archivo PDF (opcional)</Label>
-              <Input 
-                id="fileUrl" 
-                type="file" 
-                accept=".pdf" 
-                onChange={handleFileChange} 
+              <Input
+                id="fileUrl"
+                type="file"
+                accept=".pdf"
+                onChange={handleFileChange}
               />
               {formData.fileUrl && (
                 <p className="text-sm text-gray-600">
