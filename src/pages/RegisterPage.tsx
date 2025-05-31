@@ -33,6 +33,7 @@ const RegisterPage = () => {
       });
       // Redirect to verification pending page
       navigate("/verify-email");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error de registro:", error);
       
