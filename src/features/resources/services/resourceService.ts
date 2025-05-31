@@ -48,16 +48,12 @@ export const resourceService = {
     try {
       // No intentar eliminar si no hay fileId o si es el ID especial "no-file"
       if (!fileId || fileId === NO_FILE_ID) return;
-      
+
       try {
+        // Intentar eliminar el archivo del almacenamiento
         await storage.deleteFile(STORAGE_BUCKET_ID, fileId);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        // Si el archivo no existe, lo ignoramos
-        if (error?.code === 404) {
-          console.log("El archivo ya no existe en el almacenamiento");
-          return;
-        }
+      } catch (error) {
+        console.error("Error al eliminar el archivo:", error);
         throw error;
       }
     } catch (error) {
@@ -69,7 +65,9 @@ export const resourceService = {
   // Crea un recurso en la base de datos
   async createResource(data: ResourceData) {
     try {
+      // Validar que los datos necesarios estén presentes
       const currentUser = await account.get();
+      // Asegurarse de que el usuario actual esté definido
       const resourceData = {
         ...data,
         createdAt: new Date().toISOString(),
@@ -77,6 +75,7 @@ export const resourceService = {
         // Asegurarse de que fileId siempre esté presente
         fileId: data.fileId || NO_FILE_ID,
       };
+      // Crear el documento en la colección de recursos
       return (await databases.createDocument(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
@@ -92,7 +91,10 @@ export const resourceService = {
   // Obtiene todos los recursos del usuario actual
   async getResources() {
     try {
+      // Obtener el usuario actual
       const currentUser = await account.get();
+
+      // Validar que el usuario actual esté definido
       const response = await databases.listDocuments(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
@@ -108,8 +110,9 @@ export const resourceService = {
   // Actualiza un recurso existente
   async updateResource(id: string, data: UpdateResourceData) {
     try {
+      // Validar que se proporcione un ID
       if (!id) throw new Error("ID requerido");
-      
+
       // Preparar los datos de actualización
       const updateData = {
         ...data,
@@ -121,6 +124,7 @@ export const resourceService = {
         fileId: data.fileId || NO_FILE_ID,
       };
 
+      // Actualizar el documento en la colección de recursos
       return (await databases.updateDocument(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
@@ -136,7 +140,9 @@ export const resourceService = {
   // Elimina un recurso y su archivo asociado
   async deleteResource(id: string) {
     try {
+      // Validar que se proporcione un ID
       if (!id) throw new Error("ID requerido");
+      // Recuperar el recurso existente para obtener el fileId
       await databases.deleteDocument(DATABASE_ID, RESOURCES_COLLECTION_ID, id);
     } catch (error) {
       console.error("Error al eliminar el recurso:", error);

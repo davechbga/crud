@@ -4,6 +4,7 @@ import { useEffect } from "react";
 const NotFound = () => {
   const location = useLocation();
 
+  // Registrar el error en la consola para depuración
   useEffect(() => {
     console.error(
       "Error 404: El usuario intentó acceder a una ruta inexistente:",

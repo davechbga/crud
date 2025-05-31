@@ -37,6 +37,7 @@ export const useResources = () => {
   const fetchResources = async () => {
     try {
       setLoading((prev) => ({ ...prev, fetching: true }));
+      // Llamar al servicio para obtener los recursos
       const data = await resourceService.getResources();
       setResources(data);
       setError(null);
@@ -54,6 +55,7 @@ export const useResources = () => {
       // Primero intentamos eliminar el archivo antiguo si existe
       if (oldFileId && oldFileId !== NO_FILE_ID) {
         try {
+          // Intentamos eliminar el archivo antiguo
           await resourceService.deleteFile(oldFileId);
         } catch (err) {
           console.warn("Error al eliminar el archivo antiguo:", err);
@@ -78,7 +80,9 @@ export const useResources = () => {
     try {
       setLoading((prev) => ({ ...prev, creating: true }));
       const { file, ...resourceData } = data;
+      // Manejar el archivo si se proporciona
       const fileData = await handleFile(file);
+      // Crear el nuevo recurso con los datos y el archivo
       const newResource = await resourceService.createResource({
         ...resourceData,
         ...fileData,
@@ -102,9 +106,12 @@ export const useResources = () => {
         updating: { ...prev.updating, [id]: true },
       }));
 
+      // Validar que se proporcione un ID
       if (!id) throw new Error("ID requerido");
 
+      // Validar que se proporcione algún dato para actualizar
       const { file, ...resourceData } = data;
+      // Recuperar el recurso existente
       const resource = resources.find((r) => r.$id === id);
       
       // Manejar el archivo
@@ -126,6 +133,7 @@ export const useResources = () => {
         category: resourceData.category || resource?.category,
       };
 
+      // Actualizar el recurso en la base de datos
       const updatedResource = await resourceService.updateResource(
         id,
         updateData
@@ -154,8 +162,10 @@ export const useResources = () => {
         deleting: { ...prev.deleting, [id]: true },
       }));
 
+      // Validar que se proporcione un ID
       if (!id) throw new Error("ID requerido");
 
+      // Recuperar el recurso existente
       const resource = resources.find((r) => r.$id === id);
       
       // Eliminar el archivo asociado si existe
@@ -169,6 +179,7 @@ export const useResources = () => {
 
       // Eliminar el recurso de la base de datos
       await resourceService.deleteResource(id);
+      // Actualizar el estado eliminando el recurso
       setResources((prev) => prev.filter((r) => r.$id !== id));
       setError(null);
     } catch (err) {

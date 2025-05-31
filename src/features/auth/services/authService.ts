@@ -7,9 +7,11 @@ export const authService = {
   // Obtener el usuario actual
   async getCurrentUser(): Promise<User | null> {
     try {
+      // Intentar obtener la sesión actual
       const session = await account.getSession("current");
       if (!session) return null;
-      
+
+      // Si la sesión es válida, obtener los datos del usuario
       const userData = await account.get();
       return {
         $id: userData.$id,
@@ -29,11 +31,12 @@ export const authService = {
       try {
         await account.deleteSession("current");
       } catch (error) {
-        // Ignorar error si no hay sesión activa
+        console.error("No se pudo eliminar la sesión actual:", error);
       }
 
       // Crear nueva sesión
       await account.createEmailPasswordSession(email, password);
+      // Obtener los datos del usuario
       const userData = await account.get();
       return userData;
     } catch (error) {
@@ -50,17 +53,16 @@ export const authService = {
     try {
       // Crear cuenta
       await account.create(ID.unique(), email, password, fullName);
-      
+
       // Iniciar sesión automáticamente después del registro
       await account.createEmailPasswordSession(email, password);
-      
+
       // Enviar email de verificación
-      await account.createVerification(`${window.location.origin}/verify-email`);
-    } catch (error: any) {
-      // Manejar el caso específico de usuario existente
-      if (error?.code === 409) {
-        throw new Error("Ya existe una cuenta con este correo electrónico");
-      }
+      await account.createVerification(
+        `${window.location.origin}/verify-email`
+      );
+    } catch (error) {
+      console.error("Error en el registro:", error);
       handleAuthError(error, "registro");
     }
   },
@@ -68,6 +70,7 @@ export const authService = {
   // Verificar email
   async verifyEmail(userId: string, secret: string): Promise<void> {
     try {
+      // Verificar el email del usuario
       await account.updateVerification(userId, secret);
     } catch (error) {
       handleAuthError(error, "verificación de email");
@@ -77,6 +80,7 @@ export const authService = {
   // Cerrar sesión
   async logout(): Promise<void> {
     try {
+      // Eliminar la sesión actual
       await account.deleteSession("current");
     } catch (error) {
       handleAuthError(error, "cierre de sesión");

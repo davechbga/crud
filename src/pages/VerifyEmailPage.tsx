@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import {
   Card,
@@ -29,6 +30,7 @@ const VerifyEmailPage = () => {
     // Verificar si ya se realizó la verificación
     const hasVerified = localStorage.getItem(verificationKey);
 
+    // Si ya se verificó, establecer el estado de verificación
     if (userId && secret && !isVerifying && !hasVerified) {
       handleVerification(userId, secret, verificationKey);
     } else if (hasVerified) {
@@ -39,7 +41,6 @@ const VerifyEmailPage = () => {
         navigate("/login");
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, user]);
 
   const handleVerification = async (

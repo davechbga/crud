@@ -1,5 +1,11 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { AuthHeader } from "@/features/auth/components/Header";
@@ -15,13 +21,16 @@ const LoginPage = () => {
     password: "",
   });
 
+  // Manejar cambios en los campos del formulario de inicio de sesión
   const handleLoginChange = (field: keyof LoginData, value: string) => {
     setLoginData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Manejar el envío del formulario de inicio de sesión
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Llamar al servicio de inicio de sesión con las credenciales
       await login(loginData.email, loginData.password);
       toast.success("¡Bienvenido!", {
         description: "Has iniciado sesión correctamente.",
@@ -71,4 +80,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage; 
+export default LoginPage;

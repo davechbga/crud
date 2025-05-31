@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { User } from "@/interfaces/auth";
@@ -25,7 +26,6 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Hook personalizado para usar el contexto de autenticación
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -33,8 +33,6 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Función para formatear los datos del usuario
 
 // Proveedor de autenticación
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -70,8 +68,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
+      // Llamar al servicio de autenticación para iniciar sesión
       const userData = await authService.login(email, password);
-      // Actualizar el estado del usuario inmediatamente después del login exitoso
+      // Actualizar el estado del usuario con los datos obtenidos
       setUser(userData);
       // Verificar la sesión para asegurar que los datos están actualizados
       await checkSession();
@@ -92,6 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ) => {
     setLoading(true);
     try {
+      // Llamar al servicio de autenticación para registrar un nuevo usuario
       await authService.register(email, password, fullName);
       // Actualizar el estado del usuario después del registro
       await checkSession();
@@ -108,6 +108,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyEmail = async (userId: string, secret: string) => {
     setLoading(true);
     try {
+      // Llamar al servicio de autenticación para verificar el email
       await authService.verifyEmail(userId, secret);
       // Actualizar el estado del usuario después de la verificación
       await checkSession();
@@ -122,6 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Cerrar sesión
   const logout = async () => {
     try {
+      // Llamar al servicio de autenticación para cerrar sesión
       await authService.logout();
       setUser(null);
     } catch (error) {
@@ -138,5 +140,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
   };
 
+  // Proveer el contexto de autenticación
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

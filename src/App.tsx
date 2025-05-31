@@ -22,7 +22,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-
+  // Si el usuario no está autenticado, redirigir a la página de inicio de sesión
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
