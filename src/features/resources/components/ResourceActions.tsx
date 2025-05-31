@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Pencil, Plus, Trash } from "lucide-react";
+import { Ellipsis, Pencil, Trash } from "lucide-react";
 
 // Componente para el menú de acciones
 export const ResourceActions = ({
@@ -18,7 +18,7 @@ export const ResourceActions = ({
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-        <Plus className="h-4 w-4" />
+        <Ellipsis className=" h-4 w-4" />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" className="bg-white z-50">
