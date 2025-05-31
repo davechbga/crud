@@ -191,9 +191,30 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                 onChange={handleFileChange}
               />
               {formData.fileUrl && (
-                <p className="text-sm text-gray-600">
-                  Archivo seleccionado: {formData.fileUrl}
-                </p>
+                <div className="flex items-center justify-between">
+                  <a
+                    href={resource?.fileUrl || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-600 underline hover:text-blue-600"
+                  >
+                    Ver archivo actual
+                  </a>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setFormData((prev) => ({
+                        ...prev,
+                        fileUrl: "",
+                      }));
+                    }}
+                  >
+                    Eliminar archivo
+                  </Button>
+                </div>
               )}
             </div>
           </div>

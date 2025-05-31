@@ -34,7 +34,7 @@ export const resourceService = {
       return {
         fileId: response.$id,
         fileUrl: storage
-          .getFileDownload(STORAGE_BUCKET_ID, response.$id)
+          .getFileView(STORAGE_BUCKET_ID, response.$id)
           .toString(),
       };
     } catch (error) {
@@ -51,6 +51,7 @@ export const resourceService = {
       
       try {
         await storage.deleteFile(STORAGE_BUCKET_ID, fileId);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         // Si el archivo no existe, lo ignoramos
         if (error?.code === 404) {
