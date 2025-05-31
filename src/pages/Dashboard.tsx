@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { Resource } from "@/interfaces/resources";
-import ResourceForm from "../../features/resources/components/ResourceForm";
-import ResourceCard from "../../features/resources/components/ResourceCard";
+import ResourceForm from "../features/resources/components/ResourceForm";
+import ResourceCard from "../features/resources/components/ResourceCard";
 import { useResources } from "@/features/resources/hooks/useResources";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { Header } from "./Header";
-import { StatsPanel } from "./StatsPanel";
-import { SearchControls } from "./Filters";
-import { EmptyResources } from "./EmptyResources";
+import { Header } from "../components/dashboard/Header";
+import { StatsPanel } from "../components/dashboard/StatsPanel";
+import { SearchControls } from "../components/dashboard/Filters";
+import { EmptyResources } from "../components/dashboard/EmptyResources";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Constantes

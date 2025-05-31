@@ -40,8 +40,11 @@ Aplicación CRUD desarrollada con **React + TypeScript + Appwrite** para la gest
 │   └── lib.ts             ← Funciones utilitarias
 │
 ├── 📁 pages
-│   ├── Index.tsx           ← Página de inicio
-│   └── NotFound.tsx        ← Página 404
+│   ├── DashboardPage.tsx   ← Página principal del panel
+│   ├── LoginPage.tsx       ← Página de inicio de sesión
+│   ├── NotFoundPage.tsx    ← Página de error 404
+│   ├── RegisterPage.tsx    ← Página de registro
+│   └── VerifyEmailPage.tsx ← Página de verificación de correo electrónico
 │
 ├── index.css            ← Archivo de estilos globales
 ├── App.tsx              ← Componente principal de la aplicación

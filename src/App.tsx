@@ -8,7 +8,7 @@ import { AuthProvider, useAuth } from "@/features/auth/hooks/useAuth";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import VerifyEmailPage from "@/pages/VerifyEmailPage";
-import Dashboard from "@/components/dashboard/Dashboard";
+import Dashboard from "@/pages/Dashboard";
 import { Toaster } from "sonner";
 import { Spinner } from "./components/ui/spinner";
 
