@@ -13,14 +13,23 @@ import {
 type ResourceData = Omit<Resource, "$id" | "createdAt">;
 type UpdateResourceData = Partial<Resource>;
 
+// Constantes
+const NO_FILE_ID = "no-file";
+
 // Funciones auxiliares para manejo de archivos
 export const resourceService = {
   async uploadFile(file: File) {
     try {
-      const response = await storage.createFile(STORAGE_BUCKET_ID, ID.unique(), file);
+      const response = await storage.createFile(
+        STORAGE_BUCKET_ID,
+        ID.unique(),
+        file
+      );
       return {
         fileId: response.$id,
-        fileUrl: storage.getFileDownload(STORAGE_BUCKET_ID, response.$id).toString(),
+        fileUrl: storage
+          .getFileDownload(STORAGE_BUCKET_ID, response.$id)
+          .toString(),
       };
     } catch (error) {
       console.error("Error al subir el archivo:", error);
@@ -31,6 +40,9 @@ export const resourceService = {
   // Elimina un archivo del almacenamiento
   async deleteFile(fileId: string) {
     try {
+      // No intentar eliminar si no hay fileId o si es el ID especial "no-file"
+      if (!fileId || fileId === NO_FILE_ID) return;
+      
       await storage.deleteFile(STORAGE_BUCKET_ID, fileId);
     } catch (error) {
       console.error("Error al eliminar el archivo:", error);
@@ -46,13 +58,15 @@ export const resourceService = {
         ...data,
         createdAt: new Date().toISOString(),
         userId: currentUser.$id,
+        // Asegurarse de que fileId siempre esté presente
+        fileId: data.fileId || NO_FILE_ID,
       };
-      return await databases.createDocument(
+      return (await databases.createDocument(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
         ID.unique(),
         resourceData
-      ) as unknown as Resource;
+      )) as unknown as Resource;
     } catch (error) {
       console.error("Error al crear el recurso:", error);
       throw error;
@@ -79,15 +93,19 @@ export const resourceService = {
   async updateResource(id: string, data: UpdateResourceData) {
     try {
       if (!id) throw new Error("ID requerido");
-      const updateData = Object.fromEntries(
-        Object.entries(data).filter(([, value]) => value != null)
-      );
-      return await databases.updateDocument(
+      const updateData = {
+        ...data,
+        // Asegurarse de que los campos undefined no sobrescriban valores existentes
+        ...Object.fromEntries(
+          Object.entries(data).filter(([, value]) => value !== undefined)
+        ),
+      };
+      return (await databases.updateDocument(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
         id,
         updateData
-      ) as unknown as Resource;
+      )) as unknown as Resource;
     } catch (error) {
       console.error("Error al actualizar el recurso:", error);
       throw error;

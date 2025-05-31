@@ -7,8 +7,15 @@ export const authService = {
   // Obtener el usuario actual
   async getCurrentUser(): Promise<User | null> {
     try {
+      const session = await account.getSession("current");
+      if (!session) return null;
+      
       const userData = await account.get();
-      return userData;
+      return {
+        $id: userData.$id,
+        email: userData.email,
+        fullName: userData.name, // Appwrite usa 'name' para el nombre completo
+      };
     } catch (error) {
       console.error("Error al obtener el usuario actual:", error);
       return null;
@@ -18,6 +25,14 @@ export const authService = {
   // Iniciar sesión
   async login(email: string, password: string): Promise<User> {
     try {
+      // Intentar eliminar cualquier sesión existente
+      try {
+        await account.deleteSession("current");
+      } catch (error) {
+        // Ignorar error si no hay sesión activa
+      }
+
+      // Crear nueva sesión
       await account.createEmailPasswordSession(email, password);
       const userData = await account.get();
       return userData;
@@ -33,9 +48,29 @@ export const authService = {
     fullName: string
   ): Promise<void> {
     try {
+      // Crear cuenta
       await account.create(ID.unique(), email, password, fullName);
-    } catch (error) {
+      
+      // Iniciar sesión automáticamente después del registro
+      await account.createEmailPasswordSession(email, password);
+      
+      // Enviar email de verificación
+      await account.createVerification(`${window.location.origin}/verify-email`);
+    } catch (error: any) {
+      // Manejar el caso específico de usuario existente
+      if (error?.code === 409) {
+        throw new Error("Ya existe una cuenta con este correo electrónico");
+      }
       handleAuthError(error, "registro");
+    }
+  },
+
+  // Verificar email
+  async verifyEmail(userId: string, secret: string): Promise<void> {
+    try {
+      await account.updateVerification(userId, secret);
+    } catch (error) {
+      handleAuthError(error, "verificación de email");
     }
   },
 

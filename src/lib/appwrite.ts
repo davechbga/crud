@@ -14,3 +14,17 @@ export { ID };
 export const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE;
 export const RESOURCES_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION;
 export const STORAGE_BUCKET_ID = import.meta.env.VITE_APPWRITE_BUCKET;
+
+// Función para configurar el cliente de Appwrite
+export const configureAppwrite = () => {
+  // Configurar el cliente para manejar sesiones
+  client.subscribe('account', (response) => {
+    if (response.events.includes('account.*')) {
+      // Manejar eventos de cuenta
+      console.log('Account event:', response);
+    }
+  });
+};
+
+// Configurar el cliente al iniciar
+configureAppwrite();

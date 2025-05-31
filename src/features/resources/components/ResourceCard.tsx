@@ -8,12 +8,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Calendar, Link } from "lucide-react";
+import { FileText, Calendar, Link, Edit, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import type { Resource } from "@/interfaces/resources";
 import { formatDate } from "@/lib/utils";
 import { ResourceActions } from "./ResourceActions";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { Spinner } from "@/components/ui/spinner";
 
 // Constantes
 const CATEGORY_COLORS = {
@@ -27,12 +28,16 @@ interface ResourceCardProps {
   resource: Resource;
   onEdit: (resource: Resource) => void;
   onDelete: (id: string) => void;
+  isUpdating?: boolean;
+  isDeleting?: boolean;
 }
 
 const ResourceCard: React.FC<ResourceCardProps> = ({
   resource,
   onEdit,
   onDelete,
+  isUpdating = false,
+  isDeleting = false,
 }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 

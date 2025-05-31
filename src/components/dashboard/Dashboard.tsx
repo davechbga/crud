@@ -8,6 +8,7 @@ import { Header } from "./Header";
 import { StatsPanel } from "./StatsPanel";
 import { SearchControls } from "./Filters";
 import { EmptyResources } from "./EmptyResources";
+import { Spinner } from "@/components/ui/spinner";
 
 // Constantes
 const CATEGORIES = [
@@ -20,7 +21,7 @@ const CATEGORIES = [
 // Componente principal del Dashboard
 const Dashboard = () => {
   const { user, logout } = useAuth();
-  const { resources, addResource, updateResource, deleteResource } =
+  const { resources, addResource, updateResource, deleteResource, loading } =
     useResources();
   const [showForm, setShowForm] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
@@ -73,18 +74,26 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredResources.map((resource) => (
-            <ResourceCard
-              key={resource.$id}
-              resource={resource}
-              onEdit={handleEdit}
-              onDelete={deleteResource}
-            />
-          ))}
-        </div>
+        {loading.fetching ? (
+          <div className="flex justify-center items-center py-12">
+            <Spinner size="lg" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredResources.map((resource) => (
+              <ResourceCard
+                key={resource.$id}
+                resource={resource}
+                onEdit={handleEdit}
+                onDelete={deleteResource}
+                isUpdating={loading.updating[resource.$id]}
+                isDeleting={loading.deleting[resource.$id]}
+              />
+            ))}
+          </div>
+        )}
 
-        {filteredResources.length === 0 && (
+        {!loading.fetching && filteredResources.length === 0 && (
           <EmptyResources
             searchTerm={searchTerm}
             categoryFilter={categoryFilter}
@@ -102,6 +111,7 @@ const Dashboard = () => {
             setEditingResource(null);
           }}
           categories={CATEGORIES}
+          isSubmitting={loading.creating || (editingResource && loading.updating[editingResource.$id])}
         />
       )}
     </div>

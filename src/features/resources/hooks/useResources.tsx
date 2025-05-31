@@ -7,10 +7,22 @@ import { resourceService } from "../services/resourceService";
 type ResourceData = Omit<Resource, "$id" | "createdAt"> & { file?: File };
 type UpdateResourceData = Partial<Resource> & { file?: File };
 
+interface LoadingState {
+  fetching: boolean;
+  creating: boolean;
+  updating: Record<string, boolean>;
+  deleting: Record<string, boolean>;
+}
+
 // Hook para manejar los recursos
 export const useResources = () => {
   const [resources, setResources] = useState<Resource[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<LoadingState>({
+    fetching: true,
+    creating: false,
+    updating: {},
+    deleting: {},
+  });
   const [error, setError] = useState<string | null>(null);
 
   // Cargar los recursos al inicializar el hook
@@ -21,7 +33,7 @@ export const useResources = () => {
   // Función para obtener los recursos
   const fetchResources = async () => {
     try {
-      setLoading(true);
+      setLoading((prev) => ({ ...prev, fetching: true }));
       const data = await resourceService.getResources();
       setResources(data);
       setError(null);
@@ -29,74 +41,114 @@ export const useResources = () => {
       setError("Error al cargar los recursos");
       console.error(err);
     } finally {
-      setLoading(false);
+      setLoading((prev) => ({ ...prev, fetching: false }));
     }
   };
 
   // Función para manejar archivos
   const handleFile = async (file?: File, oldFileId?: string) => {
-    if (oldFileId) await resourceService.deleteFile(oldFileId);
-    if (!file) return {};
-    return await resourceService.uploadFile(file);
+    try {
+      if (oldFileId) {
+        try {
+          await resourceService.deleteFile(oldFileId);
+        } catch (err) {
+          console.warn("Error al eliminar el archivo antiguo:", err);
+        }
+      }
+      if (!file) return { fileId: "no-file", fileUrl: "" };
+      return await resourceService.uploadFile(file);
+    } catch (err) {
+      console.error("Error al manejar el archivo:", err);
+      throw err;
+    }
   };
 
   // Función para agregar un nuevo recurso
   const addResource = async (data: ResourceData) => {
     try {
-      setLoading(true);
+      setLoading((prev) => ({ ...prev, creating: true }));
       const { file, ...resourceData } = data;
       const fileData = await handleFile(file);
-      const newResource = await resourceService.createResource({ ...resourceData, ...fileData });
-      setResources(prev => [newResource, ...prev]);
+      const newResource = await resourceService.createResource({
+        ...resourceData,
+        ...fileData,
+      });
+      setResources((prev) => [newResource, ...prev]);
       setError(null);
     } catch (err) {
       setError("Error al crear el recurso");
       console.error(err);
       throw err;
     } finally {
-      setLoading(false);
+      setLoading((prev) => ({ ...prev, creating: false }));
     }
   };
 
   // Función para actualizar un recurso
   const updateResourceById = async (id: string, data: UpdateResourceData) => {
     try {
-      setLoading(true);
+      setLoading((prev) => ({
+        ...prev,
+        updating: { ...prev.updating, [id]: true },
+      }));
+
       if (!id) throw new Error("ID requerido");
-      
+
       const { file, ...resourceData } = data;
-      const resource = resources.find(r => r.$id === id);
+      const resource = resources.find((r) => r.$id === id);
       const fileData = await handleFile(file, resource?.fileId);
-      
-      const updatedResource = await resourceService.updateResource(id, { ...resourceData, ...fileData });
-      setResources(prev => prev.map(r => r.$id === id ? { ...r, ...updatedResource } : r));
+
+      // Asegurarse de que todos los campos necesarios estén presentes
+      const updateData = {
+        ...resourceData,
+        ...fileData,
+        category: resourceData.category || resource?.category,
+      };
+
+      const updatedResource = await resourceService.updateResource(
+        id,
+        updateData
+      );
+      setResources((prev) =>
+        prev.map((r) => (r.$id === id ? { ...r, ...updatedResource } : r))
+      );
       setError(null);
     } catch (err) {
       setError("Error al actualizar el recurso");
       console.error(err);
       throw err;
     } finally {
-      setLoading(false);
+      setLoading((prev) => ({
+        ...prev,
+        updating: { ...prev.updating, [id]: false },
+      }));
     }
   };
 
   // Función para eliminar un recurso
   const deleteResourceById = async (id: string) => {
     try {
-      setLoading(true);
+      setLoading((prev) => ({
+        ...prev,
+        deleting: { ...prev.deleting, [id]: true },
+      }));
+
       if (!id) throw new Error("ID requerido");
-      
-      const resource = resources.find(r => r.$id === id);
+
+      const resource = resources.find((r) => r.$id === id);
       await handleFile(undefined, resource?.fileId);
       await resourceService.deleteResource(id);
-      setResources(prev => prev.filter(r => r.$id !== id));
+      setResources((prev) => prev.filter((r) => r.$id !== id));
       setError(null);
     } catch (err) {
       setError("Error al eliminar el recurso");
       console.error(err);
       throw err;
     } finally {
-      setLoading(false);
+      setLoading((prev) => ({
+        ...prev,
+        deleting: { ...prev.deleting, [id]: false },
+      }));
     }
   };
 

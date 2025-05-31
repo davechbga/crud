@@ -21,7 +21,7 @@ export const Header = ({
         </h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-600">
-            Bienvenido, <span className="font-medium">{user?.fullName}</span>
+            Bienvenido, <span className="font-medium">{user.fullName}</span>
           </span>
           <Button variant="outline" size="sm" onClick={onLogout}>
             <LogOut className="h-4 w-4 mr-2" />
