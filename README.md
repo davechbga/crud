@@ -102,7 +102,7 @@ http://localhost:5173
 - Código modular y limpio
 - Separación lógica y componentes por feature
 - Uso de tipado fuerte con TypeScript
-- Composición con Hooks
+- Composición con Hooks y componentes reutilizables
 - Feedback inmediato al usuario con notificaciones
 
 ---
