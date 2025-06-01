@@ -71,33 +71,26 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     }));
   };
 
-  // Validar archivo
-  const validateFile = (file: File): boolean => {
-    setFileError(null);
-
+  // Validar archivo PDF
+  const validateFile = (file: File) => {
     if (file.type !== ALLOWED_FILE_TYPE) {
       setFileError("Solo se permiten archivos PDF.");
       return false;
     }
-
     if (file.size > MAX_FILE_SIZE) {
       setFileError(`El archivo no debe superar los ${MAX_FILE_SIZE_MB}MB.`);
       return false;
     }
-
+    setFileError(null);
     return true;
   };
 
   // Manejar el cambio de archivo
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && validateFile(file)) {
-      setSelectedFile(file);
-      setFormData((prev) => ({
-        ...prev,
-        fileUrl: file.name,
-      }));
-    }
+    if (!file || !validateFile(file)) return;
+    setSelectedFile(file);
+    setFormData((prev) => ({ ...prev, fileUrl: file.name }));
   };
 
   // Manejar el arrastre de archivos
@@ -114,14 +107,10 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-
-    const file = e.dataTransfer.files?.[0];
+    const file = e.dataTransfer.files[0];
     if (file && validateFile(file)) {
       setSelectedFile(file);
-      setFormData((prev) => ({
-        ...prev,
-        fileUrl: file.name,
-      }));
+      setFormData((prev) => ({ ...prev, fileUrl: file.name }));
     }
   };
 
@@ -129,7 +118,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
   const handleRemoveFile = (e?: React.MouseEvent) => {
     // Prevenir la propagación del evento si existe
     e?.stopPropagation();
-    
+
     // Limpiar el archivo seleccionado
     setSelectedFile(null);
     setFormData((prev) => ({
@@ -163,31 +152,22 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       return;
     }
 
-    // Preparar los datos
-    const submitData: Omit<Resource, "$id" | "createdAt"> & { file?: File } = {
+    const data = {
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category,
       userId: user.$id,
       linkUrl: formData.linkUrl.trim() || undefined,
-      ...(selectedFile ? { file: selectedFile } : {}),
+      ...(selectedFile && { file: selectedFile }),
     };
 
-    // Si estamos editando un recurso existente, asegurarse de que tengamos el ID
     if (resource && !resource.$id) {
-      toast.error("Error", {
-        description: "No se pudo identificar el recurso a actualizar.",
-      });
+      toast.error("No se pudo identificar el recurso a actualizar.");
       return;
     }
 
-    onSubmit(submitData);
-
-    toast.success(resource ? "Recurso actualizado" : "Recurso creado", {
-      description: resource
-        ? "El recurso ha sido actualizado correctamente."
-        : "El nuevo recurso ha sido agregado correctamente.",
-    });
+    onSubmit(data);
+    toast.success(resource ? "Recurso actualizado" : "Recurso creado");
   };
 
   return (
@@ -260,7 +240,9 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                 {selectedFile ? (
                   <div className="flex items-center justify-center space-x-2">
                     <FileText className="h-6 w-6 text-blue-500" />
-                    <span className="text-sm font-medium">{selectedFile.name}</span>
+                    <span className="text-sm font-medium">
+                      {selectedFile.name}
+                    </span>
                     <Button
                       type="button"
                       variant="ghost"

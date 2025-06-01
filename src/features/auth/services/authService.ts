@@ -4,14 +4,12 @@ import { handleAuthError } from "@/lib/utils";
 
 // Servicio de autenticación para manejar el registro, inicio de sesión y obtención del usuario actual
 export const authService = {
+  
   // Obtener el usuario actual
   async getCurrentUser(): Promise<User | null> {
     try {
-      // Intentar obtener la sesión actual
       const session = await account.getSession("current");
       if (!session) return null;
-
-      // Si la sesión es válida, obtener los datos del usuario
       const userData = await account.get();
       return {
         $id: userData.$id,
@@ -27,20 +25,16 @@ export const authService = {
   // Iniciar sesión
   async login(email: string, password: string): Promise<User> {
     try {
-      // Intentar eliminar cualquier sesión existente
-      try {
-        await account.deleteSession("current");
-      } catch (error) {
-        console.error("No se pudo eliminar la sesión actual:", error);
-      }
-
-      // Crear nueva sesión
       await account.createEmailPasswordSession(email, password);
-      // Obtener los datos del usuario
       const userData = await account.get();
-      return userData;
+      return {
+        $id: userData.$id,
+        email: userData.email,
+        fullName: userData.name,
+      };
     } catch (error) {
-      return handleAuthError(error, "inicio de sesión");
+      handleAuthError(error, "inicio de sesión");
+      throw error;
     }
   },
 
@@ -53,10 +47,6 @@ export const authService = {
     try {
       // Crear cuenta
       await account.create(ID.unique(), email, password, fullName);
-
-      // Iniciar sesión automáticamente después del registro
-      await account.createEmailPasswordSession(email, password);
-
       // Enviar email de verificación
       await account.createVerification(
         `${window.location.origin}/verify-email`

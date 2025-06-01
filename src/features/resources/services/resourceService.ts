@@ -1,5 +1,9 @@
 import { ID, Query } from "appwrite";
-import type { Resource } from "@/interfaces/resources";
+import type {
+  Resource,
+  ResourceData,
+  UpdateResourceData,
+} from "@/interfaces/resources";
 import {
   account,
   DATABASE_ID,
@@ -10,82 +14,57 @@ import {
 } from "@/lib/appwrite";
 
 // Tipos
-type ResourceData = Omit<Resource, "$id" | "createdAt">;
-type UpdateResourceData = Partial<Resource>;
 
 // Constantes
 const NO_FILE_ID = "no-file";
 
 // Funciones auxiliares para manejo de archivos
 export const resourceService = {
+  // Sube un archivo al almacenamiento y devuelve su ID y URL
   async uploadFile(file: File) {
-    try {
-      if (!file) {
-        return {
-          fileId: NO_FILE_ID,
-          fileUrl: "",
-        };
-      }
-      const response = await storage.createFile(
-        STORAGE_BUCKET_ID,
-        ID.unique(),
-        file
-      );
-      return {
-        fileId: response.$id,
-        fileUrl: storage
-          .getFileView(STORAGE_BUCKET_ID, response.$id)
-          .toString(),
-      };
-    } catch (error) {
-      console.error("Error al subir el archivo:", error);
-      throw error;
-    }
+    if (!file) return { fileId: NO_FILE_ID, fileUrl: "" };
+    const { $id } = await storage.createFile(
+      STORAGE_BUCKET_ID,
+      ID.unique(),
+      file
+    );
+    return {
+      fileId: $id,
+      fileUrl: storage.getFileView(STORAGE_BUCKET_ID, $id).toString(),
+    };
   },
 
   // Elimina un archivo del almacenamiento
   async deleteFile(fileId: string) {
-    try {
-      // No intentar eliminar si no hay fileId o si es el ID especial "no-file"
-      if (!fileId || fileId === NO_FILE_ID) return;
-
+    if (fileId && fileId !== NO_FILE_ID) {
       try {
-        // Intentar eliminar el archivo del almacenamiento
         await storage.deleteFile(STORAGE_BUCKET_ID, fileId);
-      } catch (error) {
-        console.error("Error al eliminar el archivo:", error);
-        throw error;
+      } catch (e) {
+        console.error("Error al eliminar el archivo:", e);
+        throw e;
       }
-    } catch (error) {
-      console.error("Error al eliminar el archivo:", error);
-      throw error;
     }
   },
 
   // Crea un recurso en la base de datos
   async createResource(data: ResourceData) {
     try {
-      // Validar que los datos necesarios estén presentes
-      const currentUser = await account.get();
-      // Asegurarse de que el usuario actual esté definido
+      const userId = (await account.get()).$id;
       const resourceData = {
         ...data,
         createdAt: new Date(),
-        userId: currentUser.$id,
-        // Asegurarse de que fileId siempre esté presente
-        fileId: data.fileId || NO_FILE_ID,
+        userId,
+        fileId: data.fileId ?? NO_FILE_ID,
       };
-      // Crear el documento en la colección de recursos
-      const response = await databases.createDocument(
+      const res = await databases.createDocument(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
         ID.unique(),
         resourceData
       );
-      // Convertir la fecha de string a Date
       return {
-        ...response,
-        createdAt: new Date(response.createdAt)
+        ...res,
+        createdAt: new Date(res.createdAt),
       } as unknown as Resource;
     } catch (error) {
       console.error("Error al crear el recurso:", error);
@@ -94,21 +73,17 @@ export const resourceService = {
   },
 
   // Obtiene todos los recursos del usuario actual
-  async getResources() {
+  async getResources(): Promise<Resource[]> {
     try {
-      // Obtener el usuario actual
-      const currentUser = await account.get();
-
-      // Validar que el usuario actual esté definido
-      const response = await databases.listDocuments(
+      const { $id: userId } = await account.get();
+      const { documents } = await databases.listDocuments(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
-        [Query.orderDesc("createdAt"), Query.equal("userId", currentUser.$id)]
+        [Query.orderDesc("createdAt"), Query.equal("userId", userId)]
       );
-      // Convertir las fechas de string a Date
-      return response.documents.map(doc => ({
+      return documents.map((doc) => ({
         ...doc,
-        createdAt: new Date(doc.createdAt)
+        createdAt: new Date(doc.createdAt),
       })) as unknown as Resource[];
     } catch (error) {
       console.error("Error al obtener los recursos:", error);
@@ -118,45 +93,29 @@ export const resourceService = {
 
   // Actualiza un recurso existente
   async updateResource(id: string, data: UpdateResourceData) {
-    try {
-      // Validar que se proporcione un ID
-      if (!id) throw new Error("ID requerido");
-
-      // Preparar los datos de actualización
-      const updateData = {
-        ...data,
-        // Asegurarse de que los campos undefined no sobrescriban valores existentes
-        ...Object.fromEntries(
-          Object.entries(data).filter(([, value]) => value !== undefined)
-        ),
-        // Asegurarse de que fileId siempre esté presente
-        fileId: data.fileId || NO_FILE_ID,
-      };
-
-      // Actualizar el documento en la colección de recursos
-      const response = await databases.updateDocument(
-        DATABASE_ID,
-        RESOURCES_COLLECTION_ID,
-        id,
-        updateData
-      );
-      // Convertir la fecha de string a Date
-      return {
-        ...response,
-        createdAt: new Date(response.createdAt)
-      } as unknown as Resource;
-    } catch (error) {
-      console.error("Error al actualizar el recurso:", error);
-      throw error;
-    }
+    if (!id) throw new Error("ID requerido");
+    const updateData = {
+      ...Object.fromEntries(
+        Object.entries(data).filter(([, v]) => v !== undefined)
+      ),
+      fileId: data.fileId ?? NO_FILE_ID,
+    };
+    const res = await databases.updateDocument(
+      DATABASE_ID,
+      RESOURCES_COLLECTION_ID,
+      id,
+      updateData
+    );
+    return {
+      ...res,
+      createdAt: new Date(res.createdAt),
+    } as unknown as Resource;
   },
 
-  // Elimina un recurso y su archivo asociado
+  // Elimina un recurso
   async deleteResource(id: string) {
+    if (!id) throw new Error("ID requerido");
     try {
-      // Validar que se proporcione un ID
-      if (!id) throw new Error("ID requerido");
-      // Recuperar el recurso existente para obtener el fileId
       await databases.deleteDocument(DATABASE_ID, RESOURCES_COLLECTION_ID, id);
     } catch (error) {
       console.error("Error al eliminar el recurso:", error);
