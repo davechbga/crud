@@ -14,8 +14,12 @@ import type { LoginData } from "@/interfaces/auth";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+
+  // Hooks personalizados para autenticación
   const { login, loading } = useAuth();
   const navigate = useNavigate();
+
+  // Estado local para manejar los datos del formulario de inicio de sesión
   const [loginData, setLoginData] = React.useState<LoginData>({
     email: "",
     password: "",

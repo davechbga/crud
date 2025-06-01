@@ -18,7 +18,7 @@ const CATEGORIES = [
 ];
 
 // Componente para los controles de búsqueda y filtrado
-export const SearchControls = ({
+export const Filters = ({
   searchTerm,
   setSearchTerm,
   categoryFilter,

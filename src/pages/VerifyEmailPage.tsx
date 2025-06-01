@@ -14,14 +14,18 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const VerifyEmailPage = () => {
+  // Hooks personalizados para autenticación
   const { verifyEmail, user } = useAuth();
   const navigate = useNavigate();
+  // Hook para manejar los parámetros de búsqueda en la URL
   const [searchParams] = useSearchParams();
+  // Estados locales para manejar el estado de verificación
   const [verificationStatus, setVerificationStatus] = useState<
     "pending" | "success" | "error"
   >("pending");
   const [isVerifying, setIsVerifying] = useState(false);
 
+  // Efecto para manejar la verificación de correo electrónico
   useEffect(() => {
     const userId = searchParams.get("userId");
     const secret = searchParams.get("secret");
@@ -43,6 +47,7 @@ const VerifyEmailPage = () => {
     }
   }, [searchParams, user]);
 
+  // Función para manejar la verificación del correo electrónico
   const handleVerification = async (
     userId: string,
     secret: string,
@@ -52,6 +57,7 @@ const VerifyEmailPage = () => {
 
     setIsVerifying(true);
     try {
+      // Llamar al servicio de verificación de correo electrónico
       await verifyEmail(userId, secret);
       setVerificationStatus("success");
       // Marcar como verificado en localStorage

@@ -6,7 +6,7 @@ import { useResources } from "@/features/resources/hooks/useResources";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Header } from "../components/dashboard/Header";
 import { StatsPanel } from "../components/dashboard/StatsPanel";
-import { SearchControls } from "../components/dashboard/Filters";
+import { Filters } from "../components/dashboard/Filters";
 import { EmptyResources } from "../components/dashboard/EmptyResources";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -20,9 +20,13 @@ const CATEGORIES = [
 
 // Componente principal del Dashboard
 const Dashboard = () => {
+
+  // Hooks personalizados para autenticación y recursos
   const { user, logout } = useAuth();
   const { resources, addResource, updateResource, deleteResource, loading } =
     useResources();
+
+    // Estados locales para manejar el formulario y filtros
   const [showForm, setShowForm] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,11 +42,13 @@ const Dashboard = () => {
     return matchesSearch && matchesCategory;
   });
 
+  // Manejar la edición de recursos
   const handleEdit = (resource: Resource) => {
     setEditingResource(resource);
     setShowForm(true);
   };
 
+  // Manejar el envío del formulario para agregar o actualizar recursos
   const handleFormSubmit = (
     resourceData: Omit<Resource, "$id" | "createdAt"> & { file?: File }
   ) => {
@@ -65,7 +71,7 @@ const Dashboard = () => {
         </div>
 
         <div className="mb-6">
-          <SearchControls
+          <Filters
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             categoryFilter={categoryFilter}

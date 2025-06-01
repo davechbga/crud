@@ -6,6 +6,6 @@ export interface Resource {
   fileUrl?: string;
   fileId?: string;
   linkUrl?: string;
-  createdAt: string;
+  createdAt: Date;
   userId: string;
 }

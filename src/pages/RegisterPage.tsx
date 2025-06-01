@@ -14,8 +14,11 @@ import type { RegisterData } from "@/interfaces/auth";
 import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
+  // Hooks personalizados para autenticación
   const { register, loading } = useAuth();
   const navigate = useNavigate();
+
+  // Estado local para manejar los datos del formulario de registro
   const [registerData, setRegisterData] = React.useState<RegisterData>({
     email: "",
     password: "",

@@ -70,18 +70,23 @@ export const resourceService = {
       // Asegurarse de que el usuario actual esté definido
       const resourceData = {
         ...data,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
         userId: currentUser.$id,
         // Asegurarse de que fileId siempre esté presente
         fileId: data.fileId || NO_FILE_ID,
       };
       // Crear el documento en la colección de recursos
-      return (await databases.createDocument(
+      const response = await databases.createDocument(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
         ID.unique(),
         resourceData
-      )) as unknown as Resource;
+      );
+      // Convertir la fecha de string a Date
+      return {
+        ...response,
+        createdAt: new Date(response.createdAt)
+      } as unknown as Resource;
     } catch (error) {
       console.error("Error al crear el recurso:", error);
       throw error;
@@ -100,7 +105,11 @@ export const resourceService = {
         RESOURCES_COLLECTION_ID,
         [Query.orderDesc("createdAt"), Query.equal("userId", currentUser.$id)]
       );
-      return response.documents as unknown as Resource[];
+      // Convertir las fechas de string a Date
+      return response.documents.map(doc => ({
+        ...doc,
+        createdAt: new Date(doc.createdAt)
+      })) as unknown as Resource[];
     } catch (error) {
       console.error("Error al obtener los recursos:", error);
       throw error;
@@ -125,12 +134,17 @@ export const resourceService = {
       };
 
       // Actualizar el documento en la colección de recursos
-      return (await databases.updateDocument(
+      const response = await databases.updateDocument(
         DATABASE_ID,
         RESOURCES_COLLECTION_ID,
         id,
         updateData
-      )) as unknown as Resource;
+      );
+      // Convertir la fecha de string a Date
+      return {
+        ...response,
+        createdAt: new Date(response.createdAt)
+      } as unknown as Resource;
     } catch (error) {
       console.error("Error al actualizar el recurso:", error);
       throw error;
