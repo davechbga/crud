@@ -4,7 +4,6 @@ import { handleAuthError } from "@/lib/utils";
 
 // Servicio de autenticación para manejar el registro, inicio de sesión y obtención del usuario actual
 export const authService = {
-  
   // Obtener el usuario actual
   async getCurrentUser(): Promise<User | null> {
     try {
@@ -47,6 +46,10 @@ export const authService = {
     try {
       // Crear cuenta
       await account.create(ID.unique(), email, password, fullName);
+
+      // Iniciar sesión automáticamente después del registroAdd commentMore actions
+      await account.createEmailPasswordSession(email, password);
+
       // Enviar email de verificación
       await account.createVerification(
         `${window.location.origin}/verify-email`
